@@ -1,0 +1,23 @@
+name: LocalStack Test
+on: [ push, pull_request ]
+
+jobs:
+  localstack-action-test:
+    name: 'Test LocalStack GitHub Action'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Start LocalStack
+        uses: ./
+        with:
+          image-tag: 'latest'
+          install-awslocal: 'true'
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+
+      - name: Run Tests against LocalStack
+        run: |
+          awslocal s3 mb s3://test
+          awslocal s3 ls
+          echo "Test Execution complete!" 
