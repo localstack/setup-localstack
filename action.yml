@@ -1,0 +1,34 @@
+name: 'Setup LocalStack'
+description: 'Sets up LocalStack CLI in your GitHub Actions workflow.'
+author: 'Harsh Mishra'
+
+branding:
+  icon: 'code'
+  color: 'white'
+
+inputs:
+  image-tag:
+    description: 'Tag of the LocalStack Docker image to use'
+    required: true
+    default: 'latest'
+  install-awslocal:
+    description: 'Whether to install the `awslocal` CLI into the build environment'
+    required: true
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - 
+      run: |
+        docker pull localstack/localstack:$IMAGE_TAG
+        pip install localstack
+        localstack start -d
+        localstack wait -t 30
+        if [ "$INSTALL_AWSLOCAL" = true ]; then
+          pip install awscli-local[ver1]
+        fi
+      shell: bash
+      env:
+        IMAGE_TAG: "${{ inputs.image-tag }}"
+        INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
