@@ -21,6 +21,7 @@ runs:
   steps:
     - 
       run: |
+        pip install pyopenssl -U
         docker pull localstack/localstack:$IMAGE_TAG
         pip install localstack
         localstack start -d
