@@ -15,7 +15,7 @@ To get started, you can use this minimal example:
 
 ```yml
 - name: Start LocalStack
-  uses: HarshCasper/setup-localstack@v0.1.0
+  uses: HarshCasper/setup-localstack@v0.1.1
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: HarshCasper/setup-localstack@v0.1.0
+        uses: HarshCasper/setup-localstack@v0.1.1
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
@@ -60,4 +60,4 @@ jobs:
 
 ## License
 
-[MIT License](https://github.com/HarshCasper/validate-issues-over-pull-requests/blob/main/LICENSE)
+[MIT License](LICENSE)
