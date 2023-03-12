@@ -13,6 +13,8 @@ jobs:
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
+          configuration: DEBUG=1
+          use-pro: 'true'
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
@@ -20,4 +22,4 @@ jobs:
         run: |
           awslocal s3 mb s3://test
           awslocal s3 ls
-          echo "Test Execution complete!" 
+          echo "Test Execution complete!"

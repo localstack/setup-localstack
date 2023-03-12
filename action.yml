@@ -12,9 +12,17 @@ inputs:
     required: true
     default: 'latest'
   install-awslocal:
-    description: 'Whether to install the `awslocal` CLI into the build environment'
+    description: 'Whether to install the `awslocal` CLI into the environment'
     required: true
     default: 'true'
+  use-pro:
+    description: 'Whether to use LocalStack Pro (requires a valid API key)'
+    required: false
+    default: 'false'
+  configuration:
+    description: 'Configuration variables to use for LocalStack'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -22,9 +30,17 @@ runs:
     - 
       run: |
         pip install pyopenssl -U
-        docker pull localstack/localstack:$IMAGE_TAG
+
+        if [ "$USE_PRO" = true ]; then
+          docker pull localstack/localstack-pro:"$IMAGE_TAG"
+          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=0"
+        else
+          docker pull localstack/localstack:"$IMAGE_TAG"
+        fi
+
         pip install localstack
-        localstack start -d
+        eval "${CONFIGURATION} localstack start -d"
+
         localstack wait -t 30
         if [ "$INSTALL_AWSLOCAL" = true ]; then
           pip install awscli-local[ver1]
@@ -33,3 +49,5 @@ runs:
       env:
         IMAGE_TAG: "${{ inputs.image-tag }}"
         INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
+        USE_PRO: "${{ inputs.use-pro }}"
+        CONFIGURATION: "${{ inputs.configuration }}"
