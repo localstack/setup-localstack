@@ -1,6 +1,6 @@
 name: 'Setup LocalStack'
 description: 'Sets up LocalStack CLI in your GitHub Actions workflow.'
-author: 'Harsh Mishra'
+author: 'LocalStack Team'
 
 branding:
   icon: 'code'

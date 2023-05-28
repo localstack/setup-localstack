@@ -1,6 +1,6 @@
 # Setup LocalStack
 
-[![LocalStack Test](https://github.com/HarshCasper/setup-localstack/actions/workflows/ci.yml/badge.svg)](https://github.com/HarshCasper/setup-localstack/actions/workflows/ci.yml)
+[![LocalStack Test](https://github.com/LocalStack/setup-localstack/actions/workflows/ci.yml/badge.svg)](https://github.com/LocalStack/setup-localstack/actions/workflows/ci.yml)
 
 
 A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) on your GitHub Actions runner workflow by:
@@ -15,7 +15,7 @@ To get started, you can use this minimal example:
 
 ```yml
 - name: Start LocalStack
-  uses: HarshCasper/setup-localstack@v0.1.2
+  uses: LocalStack/setup-localstack@v0.1.3
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: HarshCasper/setup-localstack@v0.1.2
+        uses: LocalStack/setup-localstack@v0.1.3
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
