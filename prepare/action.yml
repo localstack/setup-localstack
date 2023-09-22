@@ -1,0 +1,16 @@
+name: Start CI Build
+
+on: pull_request_target
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create initial PR comment
+        uses: actions-cool/maintain-one-comment@v3.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ⚡️ Running CI build with LocalStack ...
+            <!-- Sticky Pull Request Comment -->
+          body-include: '<!-- Sticky Pull Request Comment -->'
