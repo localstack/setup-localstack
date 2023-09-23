@@ -6,6 +6,9 @@ inputs:
   github_token:
     description: 'Github token used to create PR comments'
     required: true
+  ci-project:
+    description: 'Name of the CI project to track in LocalStack Cloud'
+    required: false
 
 runs:
   using: composite

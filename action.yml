@@ -23,12 +23,32 @@ inputs:
     description: 'Configuration variables to use for LocalStack'
     required: false
     default: ''
+  ci-project:
+    description: 'Name of the CI project to track in LocalStack Cloud'
+    required: false
+    default: ''
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
   steps:
-    - 
-      run: |
+    - name: Prepare LocalStack Build
+      uses: LocalStack/setup-localstack/prepare@pr-integration
+      if: inputs.ci-project && inputs.github-token
+      with:
+        github-token: ${{ inputs.github-token }}
+        ci-project: ${{ inputs.ci-project }}
+    - name: Finish LocalStack Build
+      uses: LocalStack/setup-localstack/finish@pr-integration
+      if: inputs.github-token
+      with:
+        github-token: ${{ inputs.github-token }}
+        ci-project: ${{ inputs.ci-project }}
+
+    - run: |
         pip install pyopenssl -U
 
         if [ "$USE_PRO" = true ]; then
