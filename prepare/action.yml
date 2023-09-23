@@ -1,9 +1,7 @@
 name: Start CI Build
 
-on: pull_request_target
-
 inputs:
-  github_token:
+  github-token:
     description: 'Github token used to create PR comments'
     required: true
   ci-project:
@@ -13,10 +11,20 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Save PR number
+      shell: bash
+      run: echo ${{ github.event.number }} > ./pr-id.txt
+
+    - name: Upload PR number
+      uses: actions/upload-artifact@v3
+      with:
+        name: pr
+        path: ./pr-id.txt
+
     - name: Create initial PR comment
       uses: actions-cool/maintain-one-comment@v3.1.1
       with:
-        token: ${{ inputs.github_token }}
+        token: ${{ inputs.github-token }}
         body: |
           ⚡️ Running CI build with LocalStack ...
           <!-- Sticky Pull Request Comment -->

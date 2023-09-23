@@ -1,11 +1,5 @@
 name: Finish CI Build
 
-on:
-  workflow_run:
-    workflows: ["Run CI Tests"]
-    types:
-      - completed
-
 inputs:
   github-token:
     description: 'Github token used to create PR comments'
@@ -17,7 +11,6 @@ inputs:
 runs:
   using: composite
   steps:
-    # if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     - name: Download PR artifact
       uses: dawidd6/action-download-artifact@v2
       with:
@@ -38,22 +31,3 @@ runs:
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}
-
-  # failed:
-  #   runs-on: ubuntu-latest
-  #   if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure'
-  #   steps:
-  #
-  #     - name: Save the PR ID
-  #       id: pr
-  #       run: echo "::set-output name=id::$(<pr-id.txt)"
-  #
-  #     - name: Job failure
-  #       uses: actions-cool/maintain-one-comment@v3.1.1
-  #       with:
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         body: |
-  #           Deploy PR Preview failed.
-  #           <!-- Sticky Pull Request Comment -->
-  #         body-include: '<!-- Sticky Pull Request Comment -->'
-  #         number: ${{ steps.pr.outputs.id }}
