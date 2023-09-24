@@ -24,9 +24,8 @@ runs:
         github-token: ${{ inputs.github-token }}
 
     - name: Download PR artifact
-      uses: dawidd6/action-download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
-        workflow: ${{ github.event.workflow_run.workflow_id }}
         name: pr
 
     - name: Create preview environment
@@ -36,10 +35,15 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        endpointUrl=$(curl -X POST -d '{}' \
+        response=$(curl -X POST -d '{}' \
             -H 'authorization: token ${{ inputs.localstack-api-key }}' \
             -H 'content-type: application/json' \
-            https://api.localstack.cloud/v1/previews/$previewName | jq -r .endpoint_url)
+            https://api.localstack.cloud/v1/previews/$previewName)
+        endpointUrl=$(echo "$response" | jq -r .endpoint_url)
+        if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
+          echo "Unable to create preview environment. API response: $response"
+          exit 1
+        fi
         echo "Created preview environment with endpoint URL: $endpointUrl"
 
         echo $endpointUrl > ./ls-preview-url.txt
