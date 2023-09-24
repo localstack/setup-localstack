@@ -26,12 +26,15 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
+    # TODO: load preview URL from artifacts
+
     - name: Update status comment
       uses: actions-cool/maintain-one-comment@v3.1.1
       with:
         token: ${{ inputs.github-token }}
         body: |
-          🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${{ inputs.ci-project }}
+          ${{ inputs.ci-project && `🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${inputs.ci-project}` }}
+          ${{ inputs.include-preview && '🚀 Preview for this PR: TODO add link ...' }}
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}
