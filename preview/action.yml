@@ -53,7 +53,7 @@ runs:
     - name: Upload preview instance URL
       uses: actions/upload-artifact@v3
       with:
-        name: ls-preview-url
+        name: pr
         path: ./ls-preview-url.txt
 
     - name: Run preview deployment

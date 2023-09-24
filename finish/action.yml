@@ -26,15 +26,22 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
-    # TODO: load preview URL from artifacts
+    - name: Load the preview URL
+      shell: bash
+      run: |
+        if [[ -e ls-preview-url.txt ]]; then
+          echo "LS_PREVIEW_URL=$(<ls-preview-url.txt)" >> $GITHUB_ENV
+        else
+          echo "LS_PREVIEW_URL=Unable to determine preview URL" >> $GITHUB_ENV
+        fi
 
     - name: Update status comment
       uses: actions-cool/maintain-one-comment@v3.1.1
       with:
         token: ${{ inputs.github-token }}
         body: |
-          ${{ inputs.ci-project && '🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${{ inputs.ci-project }}' }}
-          ${{ inputs.include-preview && '🚀 Preview for this PR: TODO add link ...' }}
+          ${{ inputs.ci-project && format('{0}{1}', '🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/', inputs.ci-project) }}
+          ${{ inputs.include-preview && format('{0}{1}', '🚀 Preview for this PR: ', env.LS_PREVIEW_URL) }}
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}
