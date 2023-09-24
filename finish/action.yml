@@ -33,7 +33,7 @@ runs:
       with:
         token: ${{ inputs.github-token }}
         body: |
-          ${{ inputs.ci-project && `🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${inputs.ci-project}` }}
+          ${{ inputs.ci-project && '🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${{ inputs.ci-project }}' }}
           ${{ inputs.include-preview && '🚀 Preview for this PR: TODO add link ...' }}
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
