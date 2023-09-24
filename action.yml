@@ -31,6 +31,10 @@ inputs:
     description: 'Github token used to create PR comments'
     required: false
     default: ''
+  preview-cmd:
+    description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -70,3 +74,8 @@ runs:
         INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
         USE_PRO: "${{ inputs.use-pro }}"
         CONFIGURATION: "${{ inputs.configuration }}"
+
+    # TODO: potentially add an additional step here to create preview envs, and add a switch to
+    #       to enable/disable the "Start LocalStack" action above. This way we could make this action
+    #       the single entry point which then delegates to sub-actions in this repo, based on the
+    #       user-provided configuration...

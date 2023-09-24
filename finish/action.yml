@@ -5,8 +5,12 @@ inputs:
     description: 'Github token used to create PR comments'
     required: true
   ci-project:
-    description: 'Name of the CI project to track in LocalStack Cloud'
-    required: true
+    description: 'Name of the CI project tracked in LocalStack Cloud'
+    required: false
+  include-preview:
+    description: 'Whether to include the created preview URL in the PR comment'
+    type: boolean
+    default: false
 
 runs:
   using: composite
