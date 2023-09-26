@@ -1,0 +1,41 @@
+version: '3.3'
+
+networks:
+
+  default:
+    external:
+      name: innovation-sprint
+
+volumes:
+
+  localstack:
+
+services:
+
+  localstack:
+    image: localstack/localstack-pro
+    ports:
+      - 8080:8080 # webui
+      - 4566:4566
+      - 4571:4571
+      - 4569:4569 # dynamodb
+      - 4574:4574 # lamba
+      - 127.0.0.1:4510-4559:4510-4559
+    environment:
+      - DATA_DIR=/tmp/localstack/data
+      - DEBUG=1
+      - DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LAMBDA_EXECUTOR=docker-reuse
+      - PORT_WEB_UI=8080
+      - SERVICES=lambda,dynamodb
+      - SERVICES=s3,lambda,dynamodb,apigateway,secretsmanager,kinesis,cloudwatchlogs,ecr,iam
+      - LAMBDA_DOCKER_NETWORK=innovation-sprint
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY:- }
+      - LS_LOG=trace
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=60
+      - LOCALSTACK_HOSTNAME=localhost
+      - LAMBDA_DOCKER_FLAGS="-e AWS_ENDPOINT_URL=http://127.0.0.1:15000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - localstack:/tmp/localstack/data
