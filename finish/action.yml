@@ -1,0 +1,33 @@
+name: Finish CI Build
+
+inputs:
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: true
+  ci-project:
+    description: 'Name of the CI project to track in LocalStack Cloud'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download PR artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: ${{ github.event.workflow_run.workflow_id }}
+        name: pr
+
+    - name: Load the PR ID
+      id: pr
+      shell: bash
+      run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
+
+    - name: Update status comment
+      uses: actions-cool/maintain-one-comment@v3.1.1
+      with:
+        token: ${{ inputs.github-token }}
+        body: |
+          🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${{ inputs.ci-project }}
+          <!-- Sticky Pull Request Comment -->
+        body-include: '<!-- Sticky Pull Request Comment -->'
+        number: ${{ steps.pr.outputs.pr_id }}

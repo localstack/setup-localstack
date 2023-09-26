@@ -23,28 +23,47 @@ inputs:
     description: 'Configuration variables to use for LocalStack'
     required: false
     default: ''
+  ci-project:
+    description: 'Name of the CI project to track in LocalStack Cloud'
+    required: false
+    default: ''
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
   steps:
-    - 
+    - name: Initial PR comment
+      # TODO: potentially replace with Action version number over time
+      uses: LocalStack/setup-localstack/prepare@main
+      if: inputs.ci-project && inputs.github-token
+      with:
+        github-token: ${{ inputs.github-token }}
+        ci-project: ${{ inputs.ci-project }}
+
+    - name: Start LocalStack
       run: |
         pip install pyopenssl -U
 
         if [ "$USE_PRO" = true ]; then
-          docker pull localstack/localstack-pro:"$IMAGE_TAG"
+          docker pull localstack/localstack-pro:"$IMAGE_TAG" &
           CONFIGURATION="$CONFIGURATION DNS_ADDRESS=0"
         else
-          docker pull localstack/localstack:"$IMAGE_TAG"
+          docker pull localstack/localstack:"$IMAGE_TAG" &
         fi
 
         pip install localstack
-        eval "${CONFIGURATION} localstack start -d"
-
-        localstack wait -t 30
         if [ "$INSTALL_AWSLOCAL" = true ]; then
           pip install awscli-local[ver1]
         fi
+
+        export CI_PROJECT=${{ inputs.ci-project }}
+        eval "${CONFIGURATION} localstack start -d"
+
+        localstack wait -t 30
+
       shell: bash
       env:
         IMAGE_TAG: "${{ inputs.image-tag }}"
