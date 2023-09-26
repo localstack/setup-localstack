@@ -1,5 +1,6 @@
 # Setup LocalStack
 
+
 [![LocalStack Test](https://github.com/LocalStack/setup-localstack/actions/workflows/ci.yml/badge.svg)](https://github.com/LocalStack/setup-localstack/actions/workflows/ci.yml)
 
 
