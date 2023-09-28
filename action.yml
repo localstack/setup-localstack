@@ -76,6 +76,6 @@ runs:
         CONFIGURATION: "${{ inputs.configuration }}"
 
     # TODO: potentially add an additional step here to create preview envs, and add a switch to
-    #       to enable/disable the "Start LocalStack" action above. This way we could make this action
+    #       enable/disable the "Start LocalStack" action above. This way we could make this action
     #       the single entry point which then delegates to sub-actions in this repo, based on the
     #       user-provided configuration...
