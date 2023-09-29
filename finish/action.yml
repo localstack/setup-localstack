@@ -28,6 +28,7 @@ runs:
 
     - name: Load the preview URL
       shell: bash
+      if: inputs.include-preview
       run: |
         if [[ -e ls-preview-url.txt ]]; then
           echo "LS_PREVIEW_URL=$(<ls-preview-url.txt)" >> $GITHUB_ENV
