@@ -5,8 +5,12 @@ inputs:
     description: 'Github token used to create PR comments'
     required: true
   ci-project:
-    description: 'Name of the CI project to track in LocalStack Cloud'
-    required: true
+    description: 'Name of the CI project tracked in LocalStack Cloud'
+    required: false
+  include-preview:
+    description: 'Whether to include the created preview URL in the PR comment'
+    type: boolean
+    default: false
 
 runs:
   using: composite
@@ -22,12 +26,23 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
+    - name: Load the preview URL
+      shell: bash
+      if: inputs.include-preview
+      run: |
+        if [[ -e ls-preview-url.txt ]]; then
+          echo "LS_PREVIEW_URL=$(<ls-preview-url.txt)" >> $GITHUB_ENV
+        else
+          echo "LS_PREVIEW_URL=Unable to determine preview URL" >> $GITHUB_ENV
+        fi
+
     - name: Update status comment
       uses: actions-cool/maintain-one-comment@v3.1.1
       with:
         token: ${{ inputs.github-token }}
         body: |
-          🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/${{ inputs.ci-project }}
+          ${{ inputs.ci-project && format('{0}{1}', '🚀 LocalStack Stack Insights and Cloud Pod state for this CI run: https://app.localstack.cloud/ci/', inputs.ci-project) }}
+          ${{ inputs.include-preview && format('{0}{1}', '🚀 Preview for this PR: ', env.LS_PREVIEW_URL) }}
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}

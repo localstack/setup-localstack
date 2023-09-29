@@ -1,0 +1,61 @@
+name: Create PR Preview
+
+inputs:
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: true
+  localstack-api-key:
+    description: 'LocalStack API key used to create the preview environment'
+    required: true
+  preview-cmd:
+    description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Initial PR comment
+      # TODO: potentially replace with Action version number over time
+      uses: LocalStack/setup-localstack/prepare@main
+      if: inputs.github-token
+      with:
+        github-token: ${{ inputs.github-token }}
+
+    - name: Download PR artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: pr
+
+    - name: Create preview environment
+      shell: bash
+      run: |
+        prId=$(<pr-id.txt)
+        # TODO: make preview name configurable!
+        previewName=preview-$prId
+
+        response=$(curl -X POST -d '{}' \
+            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
+            -H 'content-type: application/json' \
+            https://api.localstack.cloud/v1/previews/$previewName)
+        endpointUrl=$(echo "$response" | jq -r .endpoint_url)
+        if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
+          echo "Unable to create preview environment. API response: $response"
+          exit 1
+        fi
+        echo "Created preview environment with endpoint URL: $endpointUrl"
+
+        echo $endpointUrl > ./ls-preview-url.txt
+        echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
+        echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
+
+    - name: Upload preview instance URL
+      uses: actions/upload-artifact@v3
+      with:
+        name: pr
+        path: ./ls-preview-url.txt
+
+    - name: Run preview deployment
+      shell: bash
+      run:
+        ${{ inputs.preview-cmd }}
