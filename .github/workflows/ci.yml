@@ -23,3 +23,30 @@ jobs:
           awslocal s3 mb s3://test
           awslocal s3 ls
           echo "Test Execution complete!"
+
+  cloud-pods-test:
+    name: 'Test Cloud Pods Action'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⚡️ Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Start LocalStack
+        uses: ./
+        with:
+          image-tag: 'latest'
+          install-awslocal: 'true'
+          use-pro: 'true'
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+
+      - name: Run AWS commands
+        run: |
+          awslocal s3 mb s3://test
+          awslocal sqs create-queue --queue-name test-queue
+
+      - name: Save the Cloud Pod 
+        uses: LocalStack/setup-localstack/cloud-pods@main
+        with:
+          name: cloud-pods-test
+          action: save
