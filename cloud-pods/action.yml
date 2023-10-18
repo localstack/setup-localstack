@@ -1,0 +1,31 @@
+name: 'Save/Load a LocalStack Cloud Pod'
+
+inputs:
+  name:
+    description: 'Name of the Cloud Pod'
+    required: true
+    default: 'cloud-pod'
+  action:
+    description: 'Action to perform (save or load)'
+    required: true
+    default: 'save'
+
+runs:
+  using: "composite"
+  steps:
+    - 
+      run: |
+        if [ "$ACTION" = "save" ]; then
+          echo "Saving Cloud Pod $NAME"
+          localstack pod save $NAME
+        elif [ "$ACTION" = "load" ]; then
+          echo "Loading Cloud Pod $NAME"
+          localstack pod load $NAME
+        else
+          echo "Invalid action: $ACTION"
+          exit 1
+        fi
+      shell: bash
+      env:
+        NAME: "${{ inputs.name }}"
+        ACTION: "${{ inputs.action }}"
