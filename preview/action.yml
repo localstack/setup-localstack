@@ -35,6 +35,7 @@ runs:
         previewName=preview-$prId
 
         response=$(curl -X POST -d '{}' \
+            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
             -H 'authorization: token ${{ inputs.localstack-api-key }}' \
             -H 'content-type: application/json' \
             https://api.localstack.cloud/v1/previews/$previewName)
