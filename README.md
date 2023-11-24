@@ -15,7 +15,7 @@ To get started, you can use this minimal example:
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.1.2
+  uses: LocalStack/setup-localstack@v0.1.3
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -32,7 +32,7 @@ To get started, you can use this minimal example:
 | `configuration`    | Configuration variables to use while starting LocalStack container               | `None`   |
 | `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
 
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set if `use-pro` is set to `true`. While starting the [localstack-pro](https://hub.docker.com/r/localstack/localstack-pro) image, the DNS startup is skipped with `DNS_ADDRESS=0` configuration variable. It is required to properly start LocalStack in GitHub Actions runner environment.
+> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set if `use-pro` is set to `true`.
 
 ### Example workflow
 
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.1.2
+        uses: LocalStack/setup-localstack@v0.1.3
         with:
           image-tag: 'latest'
           install-awslocal: 'true'

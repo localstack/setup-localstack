@@ -53,7 +53,7 @@ runs:
 
         if [ "$USE_PRO" = true ]; then
           docker pull localstack/localstack-pro:"$IMAGE_TAG" &
-          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=0"
+          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
         else
           docker pull localstack/localstack:"$IMAGE_TAG" &
         fi
