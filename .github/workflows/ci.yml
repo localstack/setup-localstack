@@ -1,5 +1,10 @@
 name: LocalStack Test
-on: [ push, pull_request ]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '48 23 * * 0'
 
 jobs:
   localstack-action-test:
