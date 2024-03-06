@@ -11,6 +11,10 @@ inputs:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
     default: ''
+  auto-load-pod:
+    description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -34,7 +38,7 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d '{}' \
+        response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
             -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
             -H 'authorization: token ${{ inputs.localstack-api-key }}' \
             -H 'content-type: application/json' \
