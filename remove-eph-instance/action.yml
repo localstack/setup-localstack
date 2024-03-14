@@ -1,0 +1,37 @@
+name: Delete Preview Environment
+
+inputs:
+  localstack-api-key:
+    description: 'LocalStack API key used to access the preview environment'
+    required: true
+  pr_id:
+    description: 'The ID of the pull request. If not provided fallback to PR_ID env variable'
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Delete preview environment
+      shell: bash
+      run: |
+        if [[ -n "${{ inputs.preview_id }}" ]]; then
+          previewName=preview-${{ inputs.pr_id }}
+          echo "Id provided via input"
+        elif [[ -n "$PR_ID" ]]; then
+          previewName=preview-$PR_ID
+          echo "Id provided via env variable"
+        else
+          echo "No preview id provided"
+          exit 1
+        fi
+
+        response=$(curl -X DELETE \
+            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
+            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
+            -H 'content-type: application/json' \
+            https://api.localstack.cloud/v1/previews/$previewName)
+
+        if [[ "$response" != "{}" ]]; then
+          echo "Unable to delete preview environment. API response: $response"
+          exit 1
+        fi

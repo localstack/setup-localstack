@@ -13,13 +13,7 @@ runs:
   steps:
     - name: Save PR number
       shell: bash
-      run: echo ${{ github.event.number }} > ./pr-id.txt
-
-    - name: Upload PR number
-      uses: actions/upload-artifact@v3
-      with:
-        name: pr
-        path: ./pr-id.txt
+      run: echo "PR_ID=${{ github.event.number }}" >> $GITHUB_ENV
 
     - name: Create initial PR comment
       uses: actions-cool/maintain-one-comment@v3.1.1

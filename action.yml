@@ -41,7 +41,7 @@ runs:
   steps:
     - name: Initial PR comment
       # TODO: potentially replace with Action version number over time
-      uses: LocalStack/setup-localstack/prepare@main
+      uses: ./prepare
       if: inputs.ci-project && inputs.github-token
       with:
         github-token: ${{ inputs.github-token }}

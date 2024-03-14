@@ -21,22 +21,20 @@ runs:
   steps:
     - name: Initial PR comment
       # TODO: potentially replace with Action version number over time
-      uses: LocalStack/setup-localstack/prepare@main
+      uses: ./prepare
       if: inputs.github-token
       with:
         github-token: ${{ inputs.github-token }}
 
-    - name: Download PR artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: pr
-
     - name: Create preview environment
       shell: bash
       run: |
-        prId=$(<pr-id.txt)
+        if ! [[ -n "$PR_ID" ]]; then
+            echo "Missing pull request id"
+            exit 1
+        fi
         # TODO: make preview name configurable!
-        previewName=preview-$prId
+        previewName=preview-$PR_ID
 
         response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
             -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
@@ -50,15 +48,8 @@ runs:
         fi
         echo "Created preview environment with endpoint URL: $endpointUrl"
 
-        echo $endpointUrl > ./ls-preview-url.txt
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
         echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
-
-    - name: Upload preview instance URL
-      uses: actions/upload-artifact@v3
-      with:
-        name: pr
-        path: ./ls-preview-url.txt
 
     - name: Run preview deployment
       shell: bash

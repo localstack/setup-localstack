@@ -15,27 +15,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Download PR artifact
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: ${{ github.event.workflow_run.workflow_id }}
-        name: pr
-
-    - name: Load the PR ID
-      id: pr
-      shell: bash
-      run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
-
-    - name: Load the preview URL
-      shell: bash
-      if: inputs.include-preview
-      run: |
-        if [[ -e ls-preview-url.txt ]]; then
-          echo "LS_PREVIEW_URL=$(<ls-preview-url.txt)" >> $GITHUB_ENV
-        else
-          echo "LS_PREVIEW_URL=Unable to determine preview URL" >> $GITHUB_ENV
-        fi
-
     - name: Update status comment
       uses: actions-cool/maintain-one-comment@v3.1.1
       with:
@@ -45,4 +24,4 @@ runs:
           ${{ inputs.include-preview && format('{0}{1}', '🚀 Preview for this PR: ', env.LS_PREVIEW_URL) }}
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
-        number: ${{ steps.pr.outputs.pr_id }}
+        number: ${{ env.PR_ID }}
