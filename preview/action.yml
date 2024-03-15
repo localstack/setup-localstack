@@ -15,7 +15,10 @@ inputs:
     description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
-
+outputs:
+  LS_PREVIEW_URL: 
+    description: 'The URL of LocalStack'
+    value: ${{ jobs.create-eph-env.outputs.LS_PREVIEW_URL }}
 runs:
   using: composite
   steps:
@@ -27,6 +30,7 @@ runs:
         github-token: ${{ inputs.github-token }}
 
     - name: Create preview environment
+      id: create-eph-env
       shell: bash
       run: |
         if ! [[ -n "$PR_ID" ]]; then
@@ -50,6 +54,7 @@ runs:
 
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
         echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
+        echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_OUTPUT
 
     - name: Run preview deployment
       shell: bash

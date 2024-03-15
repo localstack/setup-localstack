@@ -1,0 +1,36 @@
+name: LocalStack Preview Test
+on:  pull_request
+
+jobs:
+  preview-test:
+    name: 'Test preview workflow'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy Preview
+        uses: ./preview
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}"
+
+      - name: Start LocalStack
+        uses: ./
+        with:
+          image-tag: 'latest'
+          install-awslocal: 'true'
+          configuration: DEBUG=1
+          use-pro: 'true'
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+
+      - name: Run Tests against LocalStack
+        run: |
+          awslocal s3 mb s3://test
+          awslocal s3 ls
+          echo "Test Execution complete!"
+          
+      - name: Delete eph instance
+        uses: ./remove-eph-instance
+        with:
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}

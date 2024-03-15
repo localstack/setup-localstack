@@ -24,14 +24,12 @@ jobs:
           awslocal s3 ls
           echo "Test Execution complete!"
 
-      - name: Delete eph instance
-        uses: ./remove-eph-instance
-        with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
-
   cloud-pods-test:
     name: 'Test Cloud Pods Action'
     runs-on: ubuntu-latest
+    env: 
+      LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+
     steps:
       - name: ⚡️ Checkout the repository
         uses: actions/checkout@v3
@@ -42,8 +40,6 @@ jobs:
           image-tag: 'latest'
           install-awslocal: 'true'
           use-pro: 'true'
-        env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
       - name: Run AWS commands
         run: |

@@ -16,10 +16,10 @@ runs:
       run: |
         if [[ -n "${{ inputs.preview_id }}" ]]; then
           previewName=preview-${{ inputs.pr_id }}
-          echo "Id provided via input"
         elif [[ -n "$PR_ID" ]]; then
           previewName=preview-$PR_ID
-          echo "Id provided via env variable"
+        elif [[ -n "${{ github.event.number }}" ]]; then
+          previewName=preview-${{ github.event.number }}
         else
           echo "No preview id provided"
           exit 1
