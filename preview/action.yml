@@ -19,9 +19,7 @@ inputs:
 runs:
   using: composite
   outputs:
-  LS_PREVIEW_URL: 
-    description: 'The URL of LocalStack'
-    value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
+    LS_PREVIEW_URL: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
   steps:
     - name: Initial PR comment
       # TODO: potentially replace with Action version number over time
