@@ -18,8 +18,8 @@ inputs:
 outputs:
   LS_PREVIEW_URL: 
     description: 'The URL of LocalStack'
-    value: ${{ setps.create-eph-env.outputs.LS_PREVIEW_URL }}
-    
+    value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
+
 runs:
   using: composite
   steps:
