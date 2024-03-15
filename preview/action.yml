@@ -15,11 +15,13 @@ inputs:
     description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
-
+outputs:
+  LS_PREVIEW_URL: 
+    description: 'The URL of LocalStack'
+    value: ${{ setps.create-eph-env.outputs.LS_PREVIEW_URL }}
+    
 runs:
   using: composite
-  outputs:
-    LS_PREVIEW_URL: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
   steps:
     - name: Initial PR comment
       # TODO: potentially replace with Action version number over time
