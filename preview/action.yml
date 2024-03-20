@@ -36,6 +36,10 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
 
+    - name: Save PR number
+      shell: bash
+      run: echo "PR_ID=${{ github.event.number }}" >> $GITHUB_ENV
+      
     - name: Create preview environment
       id: create-eph-env
       shell: bash
@@ -45,7 +49,7 @@ runs:
         elif [[ -n "$PR_ID" ]]; then
             previewName=preview-$PR_ID
         else
-            echo "Missing pull request id or preview name"
+            echo "Missing pull request id or preview name."
             exit 1
         fi
 
