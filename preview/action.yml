@@ -15,10 +15,16 @@ inputs:
     description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
+  preview_name:
+    description: 'The name of the preview instance'
+    required: false
 outputs:
   LS_PREVIEW_URL: 
     description: 'The URL of LocalStack'
     value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
+  LS_PREVIEW_NAME:
+    description: 'The name of the preview instance'
+    value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_NAME }}
 
 runs:
   using: composite
@@ -34,12 +40,14 @@ runs:
       id: create-eph-env
       shell: bash
       run: |
-        if ! [[ -n "$PR_ID" ]]; then
-            echo "Missing pull request id"
+        if [[ -n "${{ inputs.preview_name }}"  ]]; then
+            previewName=${{ inputs.preview_name }}
+        elif [[ -n "$PR_ID" ]]; then
+            previewName=preview-$PR_ID
+        else
+            echo "Missing pull request id or preview name"
             exit 1
         fi
-        # TODO: make preview name configurable!
-        previewName=preview-$PR_ID
 
         response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
             -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
@@ -56,6 +64,7 @@ runs:
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
         echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_OUTPUT
+        echo "LS_PREVIEW_NAME=$previewName" >> $GITHUB_OUTPUT
 
     - name: Run preview deployment
       shell: bash

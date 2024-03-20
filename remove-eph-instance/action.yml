@@ -4,7 +4,10 @@ inputs:
   localstack-api-key:
     description: 'LocalStack API key used to access the preview environment'
     required: true
-  pr_id:
+  preview_name:
+    description: 'The name of the instance to remove'
+    required: false
+  preview_id:
     description: 'The ID of the pull request. If not provided fallback to PR_ID env variable'
     required: false
 
@@ -14,14 +17,16 @@ runs:
     - name: Delete preview environment
       shell: bash
       run: |
-        if [[ -n "${{ inputs.preview_id }}" ]]; then
-          previewName=preview-${{ inputs.pr_id }}
+        if [[ -n "${{ inputs.preview_name }}" ]]; then
+          previewName=preview-${{ inputs.preview_name }}
+        elif [[ -n "${{ inputs.preview_id }}" ]]; then
+          previewName=preview-${{ inputs.preview_id }}
         elif [[ -n "$PR_ID" ]]; then
           previewName=preview-$PR_ID
         elif [[ -n "${{ github.event.number }}" ]]; then
           previewName=preview-${{ github.event.number }}
         else
-          echo "No preview id provided"
+          echo "No preview id or preview name provided"
           exit 1
         fi
 
