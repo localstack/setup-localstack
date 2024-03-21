@@ -11,7 +11,7 @@ jobs:
       - name: Deploy Preview
         uses: ./preview
         with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}"
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
 
       - name: Start LocalStack
         uses: ./
