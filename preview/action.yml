@@ -15,28 +15,43 @@ inputs:
     description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
+  preview_name:
+    description: 'The name of the preview instance'
+    required: false
+outputs:
+  LS_PREVIEW_URL: 
+    description: 'The URL of LocalStack'
+    value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_URL }}
+  LS_PREVIEW_NAME:
+    description: 'The name of the preview instance'
+    value: ${{ steps.create-eph-env.outputs.LS_PREVIEW_NAME }}
 
 runs:
   using: composite
   steps:
     - name: Initial PR comment
       # TODO: potentially replace with Action version number over time
-      uses: LocalStack/setup-localstack/prepare@main
+      uses: ./prepare
       if: inputs.github-token
       with:
         github-token: ${{ inputs.github-token }}
 
-    - name: Download PR artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: pr
-
+    - name: Save PR number
+      shell: bash
+      run: echo "PR_ID=${{ github.event.number }}" >> $GITHUB_ENV
+      
     - name: Create preview environment
+      id: create-eph-env
       shell: bash
       run: |
-        prId=$(<pr-id.txt)
-        # TODO: make preview name configurable!
-        previewName=preview-$prId
+        if [[ -n "${{ inputs.preview_name }}"  ]]; then
+            previewName=${{ inputs.preview_name }}
+        elif [[ -n "$PR_ID" ]]; then
+            previewName=preview-$PR_ID
+        else
+            echo "Missing pull request id or preview name."
+            exit 1
+        fi
 
         response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
             -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
@@ -50,15 +65,10 @@ runs:
         fi
         echo "Created preview environment with endpoint URL: $endpointUrl"
 
-        echo $endpointUrl > ./ls-preview-url.txt
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
         echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
-
-    - name: Upload preview instance URL
-      uses: actions/upload-artifact@v3
-      with:
-        name: pr
-        path: ./ls-preview-url.txt
+        echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_OUTPUT
+        echo "LS_PREVIEW_NAME=$previewName" >> $GITHUB_OUTPUT
 
     - name: Run preview deployment
       shell: bash
