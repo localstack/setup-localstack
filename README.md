@@ -15,7 +15,7 @@ To get started, you can use this minimal example:
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.1.3
+  uses: LocalStack/setup-localstack@v0.1.2
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.1.3
+        uses: LocalStack/setup-localstack@v0.1.2
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
