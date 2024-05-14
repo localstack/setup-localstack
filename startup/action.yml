@@ -1,10 +1,4 @@
-name: 'Setup LocalStack'
-description: 'Sets up LocalStack CLI in your GitHub Actions workflow.'
-author: 'LocalStack Team'
-
-branding:
-  icon: 'code'
-  color: 'white'
+name: 'Start up Localstack'
 
 inputs:
   image-tag:
@@ -27,14 +21,6 @@ inputs:
     description: 'Name of the CI project to track in LocalStack Cloud'
     required: false
     default: ''
-  github-token:
-    description: 'Github token used to create PR comments'
-    required: false
-    default: ''
-  preview-cmd:
-    description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
-    required: false
-    default: ''
 
 runs:
   using: "composite"
@@ -47,15 +33,33 @@ runs:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
 
-    - name: Start Localstack
-      uses: jenseng/dynamic-uses@v1
+    - name: Start LocalStack
+      run: |
+        pip install pyopenssl -U
+
+        if [ "$USE_PRO" = true ]; then
+          docker pull localstack/localstack-pro:"$IMAGE_TAG" &
+          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
+        else
+          docker pull localstack/localstack:"$IMAGE_TAG" &
+        fi
+
+        pip install localstack
+        if [ "$INSTALL_AWSLOCAL" = true ]; then
+          pip install awscli-local[ver1]
+        fi
+
+        export CI_PROJECT=${{ inputs.ci-project }}
+        eval "${CONFIGURATION} localstack start -d"
+
+        localstack wait -t 30
+
+      shell: bash
       env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
-      with:
-        # now you can use expressions 🥳
-        uses: LocalStack/setup-localstack/startup@${{ env.action-version }}
-        # the `with` needs to be converted to a valid json string
-        with: "${{ toJSON(inputs) }}"
+        IMAGE_TAG: "${{ inputs.image-tag }}"
+        INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
+        USE_PRO: "${{ inputs.use-pro }}"
+        CONFIGURATION: "${{ inputs.configuration }}"
 
     # TODO: potentially add an additional step here to create preview envs, and add a switch to
     #       enable/disable the "Start LocalStack" action above. This way we could make this action
