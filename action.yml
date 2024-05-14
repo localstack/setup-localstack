@@ -52,7 +52,7 @@ runs:
         pip install pyopenssl -U
 
         LS_IMAGE_STUB="localstack/localstack"
-        if [ -n ${CODEBUILD_BUILD_ID+x} ]; then
+        if [ "x${CODEBUILD_BUILD_ID}" != "x" ]; then
           LS_IMAGE_STUB="public.ecr.aws/${LS_IMAGE_STUB}"
         fi
 
