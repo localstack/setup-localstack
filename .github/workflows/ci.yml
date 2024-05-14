@@ -50,3 +50,5 @@ jobs:
         with:
           name: cloud-pods-test
           action: save
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
