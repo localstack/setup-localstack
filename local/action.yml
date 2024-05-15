@@ -1,0 +1,46 @@
+name: 'Save/Load LocalStack state'
+
+inputs:
+  name:
+    description: 'Name of the artifact'
+    required: true
+    default: 'ls-state'
+  action:
+    description: 'Action to perform (save or load)'
+    required: true
+    default: 'save'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Download PR artifact
+      uses: dawidd6/action-download-artifact@v2
+      if: ${{ inputs.action == 'load' }}
+      env:
+        workflow_id: ${{ fromJSON(format('["{0}","{1}"]', env.WORKFLOW_ID, github.event.workflow_run.workflow_id))[env.WORKFLOW_ID == ''] }} 
+      with:
+        workflow: 
+        name: ${{ inputs.name }}
+
+    - run: |
+        if [ "$ACTION" = "save" ]; then
+          echo "Saving State $NAME"
+          localstack state export $NAME
+        elif [ "$ACTION" = "load" ]; then
+          echo "Loading State $NAME"
+          localstack state import $NAME
+        else
+          echo "Invalid action: $ACTION"
+          exit 1
+        fi
+      shell: bash
+      env:
+        NAME: "${{ inputs.name }}"
+        ACTION: "${{ inputs.action }}"
+
+    - name: Upload LocalStack State
+      uses: actions/upload-artifact@v3
+      if: ${{ inputs.action == 'save' }}
+      with:
+        name: ${{ inputs.name }}
+        path: ./${{ inputs.name }}.zip
