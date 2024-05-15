@@ -16,7 +16,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Finalize PR comment
-        uses: LocalStack/setup-localstack/finish@main
+        uses: ./finish
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           include-preview: true
