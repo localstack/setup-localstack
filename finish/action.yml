@@ -9,8 +9,10 @@ inputs:
     required: false
   include-preview:
     description: 'Whether to include the created preview URL in the PR comment'
-    type: boolean
-    default: false
+    required: false
+  preview-url:
+    description: 'The preview url to include in the PR comment'
+    required: false
 
 runs:
   using: composite
@@ -30,7 +32,9 @@ runs:
       shell: bash
       if: inputs.include-preview
       run: |
-        if [[ -e ls-preview-url.txt ]]; then
+        if [[ -n "${{ inputs.preview-url }}" ]]; then
+          echo "LS_PREVIEW_URL=${{ inputs.preview-url }}" >> $GITHUB_ENV
+        elif [[ -e ls-preview-url.txt ]]; then
           echo "LS_PREVIEW_URL=$(<ls-preview-url.txt)" >> $GITHUB_ENV
         else
           echo "LS_PREVIEW_URL=Unable to determine preview URL" >> $GITHUB_ENV
