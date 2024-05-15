@@ -38,6 +38,9 @@ runs:
         pip install pyopenssl -U
 
         if [ "$USE_PRO" = true ]; then
+          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" || "x$LOCALSTACK_API_KEY" = "x" ]; then
+            echo "WARNING: LocalStack API key not detected, please verify your configuration..."
+          fi
           docker pull localstack/localstack-pro:"$IMAGE_TAG" &
           CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
         else
@@ -61,7 +64,3 @@ runs:
         USE_PRO: "${{ inputs.use-pro }}"
         CONFIGURATION: "${{ inputs.configuration }}"
 
-    # TODO: potentially add an additional step here to create preview envs, and add a switch to
-    #       enable/disable the "Start LocalStack" action above. This way we could make this action
-    #       the single entry point which then delegates to sub-actions in this repo, based on the
-    #       user-provided configuration...
