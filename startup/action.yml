@@ -29,6 +29,7 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # # NOTE: Thinking about this if we need it
     # - name: Initial PR comment
     #   # TODO: potentially replace with Action version number over time
     #   uses: LocalStack/setup-localstack/prepare@main
@@ -65,5 +66,9 @@ runs:
 
       shell: bash
       env:
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        INSTALL_AWSLOCAL: ${{ inputs.install-awslocal }}
+        USE_PRO: ${{ inputs.use-pro }}
+        CONFIGURATION: ${{ inputs.configuration }}
         SKIP_WAIT: ${{ inputs.skip-wait }}
 
