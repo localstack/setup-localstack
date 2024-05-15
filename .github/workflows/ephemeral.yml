@@ -1,0 +1,22 @@
+name: LocalStack Ephemeral Instance Test
+on:  pull_request
+
+jobs:
+  preview-test:
+    permissions: write-all
+    name: 'Test ephemeral instance workflow'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy Preview
+        uses: ./preview
+        with:
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Shutdown ephemeral instance
+        uses: ./ephemeral/shutdown
+        with:
+          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

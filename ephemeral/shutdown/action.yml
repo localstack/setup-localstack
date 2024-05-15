@@ -1,0 +1,51 @@
+name: Shutdown Ephemeral Instance
+
+inputs:
+  localstack-api-key:
+    description: 'LocalStack API key used to access the platform api'
+    required: true
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: true
+    
+
+runs:
+  using: composite
+  steps:
+    - name: Download PR artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: pr
+
+    - name: Load the PR ID
+      id: pr
+      shell: bash
+      run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
+
+    - name: Shutdown ephemeral instance
+      shell: bash
+      run: |
+        prId=$(<pr-id.txt)
+        # TODO: make preview_name configurable
+        previewName=preview-$prId
+
+        response=$(curl -X DELETE \
+            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
+            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
+            -H 'content-type: application/json' \
+            https://api.localstack.cloud/v1/previews/$previewName)
+        if [[ "$response" != "{}" ]]; then
+          # In case the deletion fails, e.g. if the instance cannot be found, we raise a proper error on the platform
+          echo "Unable to delete preview environment. API response: $response"
+          exit 1
+        fi
+    
+    - name: Update status comment
+      uses: actions-cool/maintain-one-comment@v3.1.1
+      with:
+        token: ${{ inputs.github-token }}
+        body: |
+          The ephemeral instance for the application preview has been shut down
+          <!-- Sticky Pull Request Comment -->
+        body-include: '<!-- Sticky Pull Request Comment -->'
+        number: ${{ steps.pr.outputs.pr_id }}
