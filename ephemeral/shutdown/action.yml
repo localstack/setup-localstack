@@ -1,0 +1,31 @@
+name: Shutdown Ephemeral Instance
+
+inputs:
+  localstack-api-key:
+    description: 'LocalStack API key used to access the platform api'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download PR artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: pr
+
+    - name: Shutdown ephemeral instance
+      shell: bash
+      run: |
+        prId=$(<pr-id.txt)
+        # TODO: make preview_name configurable
+        previewName=preview-$prId
+
+        response=$(curl -X DELETE \
+            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
+            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
+            -H 'content-type: application/json' \
+            https://api.localstack.cloud/v1/previews/$previewName)
+        if [[ "$response" != "{}" ]]; then
+          echo "Unable to delete preview environment. API response: $response"
+          exit 1
+        fi
