@@ -38,10 +38,22 @@ runs:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
 
+    - name: Install tools
+      uses: jenseng/dynamic-uses@v1
+      env:
+        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+      with:
+        # now we can dynamically determine sub-action versions 🥳
+        uses: LocalStack/setup-localstack/tools@${{ env.action-version }}
+        # the `with` needs to be converted to a valid json string
+        # keeping in there install-awslocal for backward compatibility
+        with: |-
+          {
+            "install-awslocal": "${{ inputs.install-awslocal }}",
+          }
+
     - name: Start LocalStack
       run: |
-        pip install pyopenssl -U
-
         if [ "$USE_PRO" = true ]; then
           if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" || "x$LOCALSTACK_API_KEY" = "x" ]; then
             echo "WARNING: LocalStack API key not detected, please verify your configuration..."
@@ -50,11 +62,6 @@ runs:
           CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
         else
           docker pull localstack/localstack:"$IMAGE_TAG" &
-        fi
-
-        pip install localstack
-        if [ "$INSTALL_AWSLOCAL" = true ]; then
-          pip install awscli-local[ver1]
         fi
 
         export CI_PROJECT=${{ inputs.ci-project }}

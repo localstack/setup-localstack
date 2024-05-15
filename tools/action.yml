@@ -1,0 +1,24 @@
+name: 'Install Localstack tools'
+
+inputs:
+  install-awslocal:
+    description: 'Whether to install the `awslocal` CLI into the environment'
+    required: true
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Start LocalStack
+      run: |
+        pip install pyopenssl -U
+
+        pip install localstack
+        if [ "$INSTALL_AWSLOCAL" = true ]; then
+          pip install awscli-local[ver1]
+        fi
+
+      shell: bash
+      env:
+        INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
+
