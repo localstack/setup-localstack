@@ -14,6 +14,11 @@ jobs:
           localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Finalize PR comment
+        uses: LocalStack/setup-localstack/finish@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          include-preview: true
           
       - name: Shutdown ephemeral instance
         uses: ./ephemeral/shutdown
