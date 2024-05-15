@@ -4,6 +4,10 @@ inputs:
   localstack-api-key:
     description: 'LocalStack API key used to access the platform api'
     required: true
+  github-token:
+    description: 'Github token used to create PR comments'
+    required: true
+    
 
 runs:
   using: composite
@@ -30,3 +34,13 @@ runs:
           echo "Unable to delete preview environment. API response: $response"
           exit 1
         fi
+    
+    - name: Update status comment
+      uses: actions-cool/maintain-one-comment@v3.1.1
+      with:
+        token: ${{ inputs.github-token }}
+        body: |
+          The Ephemeral Instance has been shutdown
+          <!-- Sticky Pull Request Comment -->
+        body-include: '<!-- Sticky Pull Request Comment -->'
+        number: ${{ steps.pr.outputs.pr_id }}
