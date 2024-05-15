@@ -35,11 +35,15 @@ inputs:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
     default: ''
-  no-startup:
+  skip-startup:
     description: |
       Explicitly prevent LocalStack start up.
       Useful to manage state later on in the pipeline or start up ephemeral instance
     required: true
+    default: 'false'
+  skip-wait:
+    description: Skip wait for LocalStack
+    required: false
     default: 'false'
   state-action:
     description: |
@@ -64,7 +68,7 @@ runs:
   steps:
     - name: Start Localstack
       uses: jenseng/dynamic-uses@v1
-      if: ${{ inputs.no-startup != 'true' }}
+      if: ${{ inputs.skip-startup != 'true' }}
       env:
         action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
@@ -77,7 +81,8 @@ runs:
             "install-awslocal": "${{ inputs.install-awslocal }}",
             "use-pro": "${{ inputs.use-pro }}",
             "configuration": "${{ inputs.configuration }}",
-            "ci-project": "${{ inputs.ci-project }}"
+            "ci-project": "${{ inputs.ci-project }}",
+            "skip-wait": "${{ inputs.skip-wait }}"
           }
 
     # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
