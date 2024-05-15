@@ -3,6 +3,7 @@ on:  pull_request
 
 jobs:
   preview-test:
+    permissions: write-all
     name: 'Test ephemeral instance workflow'
     runs-on: ubuntu-latest
     steps:
