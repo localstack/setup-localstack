@@ -35,29 +35,61 @@ inputs:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
     default: ''
+  no-startup:
+    description: |
+      Explicitly prevent LocalStack start up.
+      Useful to manage state later on in the pipeline or start up ephemeral instance
+    required: true
+    default: 'false'
+  state-action:
+    description: |
+      Manage LocalStack state
+      Valid values are `load``, `save`, ``
+      Defaults to `` (empty) -> don't manage state
+    required: false
+    default: ''
+  state-local:
+    description: |
+      Either store the state of LocalStack locally or as a cloud pod.
+      Valid values are `cloud-pods` or `local`.
+      Use this option in unison with `state-action` to control behaviour.
+    required: false
+    default: 'cloud-pods'
+  state-name:
+    description: 'Name of the state artifact'
+    required: false
 
 runs:
   using: "composite"
   steps:
-    # - name: Initial PR comment
-    #   # TODO: potentially replace with Action version number over time
-    #   uses: LocalStack/setup-localstack/prepare@main
-    #   if: inputs.ci-project && inputs.github-token
-    #   with:
-    #     github-token: ${{ inputs.github-token }}
-    #     ci-project: ${{ inputs.ci-project }}
-
     - name: Start Localstack
+      uses: jenseng/dynamic-uses@v1
+      if: ${{ inputs.no-startup != 'true' }}
+      env:
+        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+      with:
+        # now we can dynamically determine sub-action versions 🥳
+        uses: LocalStack/setup-localstack/startup@${{ env.action-version }}
+        # the `with` needs to be converted to a valid json string
+        with: |-
+          {
+            "image-tag": "${{ inputs.image-tag }}",
+            "install-awslocal": "${{ inputs.install-awslocal }}",
+            "use-pro": "${{ inputs.use-pro }}",
+            "configuration": "${{ inputs.configuration }}",
+            "ci-project": "${{ inputs.ci-project }}"
+          }
+
+    # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
+    - name: Manage state
+      if: ${{ (inputs.state-action == 'save' || inputs.state-action == 'load') }}
       uses: jenseng/dynamic-uses@v1
       env:
         action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        # now you can use expressions 🥳
-        uses: LocalStack/setup-localstack/startup@${{ env.action-version }}
-        # the `with` needs to be converted to a valid json string
-        with: "${{ toJSON(inputs) }}"
-
-    # TODO: potentially add an additional step here to create preview envs, and add a switch to
-    #       enable/disable the "Start LocalStack" action above. This way we could make this action
-    #       the single entry point which then delegates to sub-actions in this repo, based on the
-    #       user-provided configuration...
+        uses: LocalStack/setup-localstack/${{ inputs.state-local }}@${{ env.action-version }}
+        with: |-
+          {
+            "name": "${{ inputs.state-name }}",
+            "action": "${{ inputs.state-action }}"
+          }

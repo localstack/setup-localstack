@@ -51,9 +51,10 @@ jobs:
           awslocal sqs create-queue --queue-name test-queue
 
       - name: Save the Cloud Pod 
-        uses: LocalStack/setup-localstack/cloud-pods@main
+        uses: ./
         with:
-          name: cloud-pods-test
-          action: save
+          state-name: cloud-pods-test
+          state-action: save
+          no-startup: 'true'
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
