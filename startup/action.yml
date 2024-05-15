@@ -21,6 +21,10 @@ inputs:
     description: 'Name of the CI project to track in LocalStack Cloud'
     required: false
     default: ''
+  skip-wait:
+    description: 'Skip wait for LocalStack'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -55,12 +59,11 @@ runs:
         export CI_PROJECT=${{ inputs.ci-project }}
         eval "${CONFIGURATION} localstack start -d"
 
-        localstack wait -t 30
+        if [ "$SKIP_WAIT" = false ]; then
+          localstack wait -t ${LS_WAIT_TIMEOUT:-30}  # Let users configure the timeout via env variable
+        fi
 
       shell: bash
       env:
-        IMAGE_TAG: "${{ inputs.image-tag }}"
-        INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
-        USE_PRO: "${{ inputs.use-pro }}"
-        CONFIGURATION: "${{ inputs.configuration }}"
+        SKIP_WAIT: ${{ inputs.skip-wait }}
 
