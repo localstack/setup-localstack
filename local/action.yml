@@ -25,10 +25,10 @@ runs:
     - run: |
         if [ "$ACTION" = "save" ]; then
           echo "Saving State $NAME"
-          localstack state export $NAME
+          localstack state export ${NAME}.zip
         elif [ "$ACTION" = "load" ]; then
           echo "Loading State $NAME"
-          localstack state import $NAME
+          localstack state import ${NAME}.zip
         else
           echo "Invalid action: $ACTION"
           exit 1

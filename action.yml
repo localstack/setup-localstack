@@ -52,7 +52,7 @@ inputs:
       Defaults to `` (empty) -> don't manage state
     required: false
     default: ''
-  state-local:
+  state-backend:
     description: |
       Either store the state of LocalStack locally or as a cloud pod.
       Valid values are `cloud-pods` or `local`.
@@ -105,7 +105,7 @@ runs:
       env:
         action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/${{ inputs.state-local }}@${{ env.action-version }}
+        uses: LocalStack/setup-localstack/${{ inputs.state-backend }}@${{ env.action-version }}
         with: |-
           {
             "name": "${{ inputs.state-name }}",

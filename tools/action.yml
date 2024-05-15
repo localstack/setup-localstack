@@ -11,11 +11,9 @@ runs:
   steps:
     - name: Start LocalStack
       run: |
-        pip install pyopenssl -U
-
-        pip install localstack
+        which localstack > /dev/null || pip install localstack
         if [ "$INSTALL_AWSLOCAL" = true ]; then
-          pip install awscli-local[ver1]
+          which awslocal > /dev/null || pip install awscli-local[ver1]
         fi
 
       shell: bash
