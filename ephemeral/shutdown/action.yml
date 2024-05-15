@@ -17,6 +17,11 @@ runs:
       with:
         name: pr
 
+    - name: Load the PR ID
+      id: pr
+      shell: bash
+      run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
+
     - name: Shutdown ephemeral instance
       shell: bash
       run: |
@@ -40,7 +45,7 @@ runs:
       with:
         token: ${{ inputs.github-token }}
         body: |
-          The ephemeral instance for the application preview has been shutdown
+          The ephemeral instance for the application preview has been shut down
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}
