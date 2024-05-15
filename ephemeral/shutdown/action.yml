@@ -40,7 +40,7 @@ runs:
       with:
         token: ${{ inputs.github-token }}
         body: |
-          The Ephemeral Instance has been shutdown
+          The ephemeral instance for the application preview has been shutdown
           <!-- Sticky Pull Request Comment -->
         body-include: '<!-- Sticky Pull Request Comment -->'
         number: ${{ steps.pr.outputs.pr_id }}

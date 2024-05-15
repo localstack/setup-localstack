@@ -19,3 +19,4 @@ jobs:
         uses: ./ephemeral/shutdown
         with:
           localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
