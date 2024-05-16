@@ -34,33 +34,39 @@ inputs:
   preview-cmd:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
-    default: ''
+  include-preview:
+    description: 'Whether to include the created preview URL in the PR comment'
+    required: false
   skip-startup:
     description: |
-      Explicitly prevent LocalStack start up.
-      Useful to manage state later on in the pipeline or start up ephemeral instance
+      Explicitly prevent LocalStack start up, only installs CLI(s).
+      Recommended to manage state later on in the pipeline or start up an ephemeral instance
     required: true
     default: 'false'
   skip-wait:
-    description: Skip wait for LocalStack
+    description: 'Skip wait for LocalStack'
+    required: false
+    default: 'false'
+  skip-preview-stop:
+    description: 'Skip stopping LocalStack Ephemeral Instance'
     required: false
     default: 'false'
   state-action:
     description: |
       Manage LocalStack state
-      Valid values are `load``, `save`, ``
-      Defaults to `` (empty) -> don't manage state
+      Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state)
+      Values `start`/`stop` only usable with app previews.
     required: false
     default: ''
   state-backend:
     description: |
       Either store the state of LocalStack locally or as a cloud pod.
-      Valid values are `cloud-pods` or `local`.
+      Valid values are `cloud-pods`, `preview` or `local`.
       Use this option in unison with `state-action` to control behaviour.
     required: false
     default: 'cloud-pods'
   state-name:
-    description: 'Name of the state artifact'
+    description: 'Name of the state artifact (without extension)'
     required: false
 
 runs:
@@ -100,7 +106,7 @@ runs:
 
     # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
     - name: Manage state
-      if: ${{ (inputs.state-action == 'save' || inputs.state-action == 'load') }}
+      if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
       uses: jenseng/dynamic-uses@v1
       env:
         action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
@@ -110,4 +116,45 @@ runs:
           {
             "name": "${{ inputs.state-name }}",
             "action": "${{ inputs.state-action }}"
+          }
+
+    - name: Create Ephemeral Instance
+      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
+      uses: jenseng/dynamic-uses@v1
+      env:
+        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+      with:
+        uses: LocalStack/setup-localstack/preview@${{ env.action-version }}
+        with: |-
+          {
+            "github-token": "${{ inputs.github-token }}",
+            "preview-cmd": "${{ inputs.preview-cmd }}",
+            "auto-load-pod": "${{ inputs.state-name }}"
+          }
+
+    - name: Display Ephemeral Instance URL
+      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
+      uses: jenseng/dynamic-uses@v1
+      env:
+        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+        default-include-preview: ${{ fromJSON('["false","true"]')[github.event_name == 'pull_request'] }}
+      with:
+        uses: LocalStack/setup-localstack/finish@${{ env.action-version }}
+        with: |-
+          {
+            "github-token": "${{ inputs.github-token }}",
+            "ci-project": "${{ inputs.ci-project }}",
+            "include-preview": "${{ fromJSON('["{0}","{1}"]', env.include-preview, inputs.include-preview))[inputs.include-preview != ''] }}"
+          }
+    
+    - name: Stop Ephemeral Instance
+      if: ${{ !inputs.skip-preview-stop && (inputs.state-action == 'stop' && inputs.state-backend == 'preview' }}
+      uses: jenseng/dynamic-uses@v1
+      env:
+        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+      with:
+        uses: LocalStack/setup-localstack/ephemeral/shutdown@${{ env.action-version }}
+        with: |-
+          {
+            "name": "${{ inputs.github-token }}",
           }
