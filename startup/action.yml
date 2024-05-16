@@ -37,16 +37,13 @@ runs:
     #   with:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
+    - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+      shell: bash
 
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        # now we can dynamically determine sub-action versions 🥳
-        uses: LocalStack/setup-localstack/tools@${{ env.action-version }}
-        # the `with` needs to be converted to a valid json string
-        # keeping in there install-awslocal for backward compatibility
+        uses: ${{ env.action-root }}/tools
         with: |-
           {
             "install-awslocal": "${{ inputs.install-awslocal }}",

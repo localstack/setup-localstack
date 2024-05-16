@@ -72,13 +72,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+      shell: bash
+    
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
       if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'preview' }}
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/tools@${{ env.action-version }}
+        uses: ${{ env.action-root }}/tools
         with: |-
           {
             "install-awslocal": "${{ inputs.install-awslocal }}",
@@ -87,11 +88,9 @@ runs:
     - name: Start Localstack
       uses: jenseng/dynamic-uses@v1
       if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'preview' }}
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        # now we can dynamically determine sub-action versions 🥳
-        uses: LocalStack/setup-localstack/startup@${{ env.action-version }}
+        # now we can dynamically determine sub-action path 🥳
+        uses: ${{ env.action-root }}/startup
         # the `with` needs to be converted to a valid json string
         # keeping in there install-awslocal for backward compatibility
         with: |-
@@ -108,10 +107,8 @@ runs:
     - name: Manage state
       if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
       uses: jenseng/dynamic-uses@v1
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/${{ inputs.state-backend }}@${{ env.action-version }}
+        uses: ${{ env.action-root }}/${{ inputs.state-backend }}
         with: |-
           {
             "name": "${{ inputs.state-name }}",
@@ -121,10 +118,8 @@ runs:
     - name: Create Ephemeral Instance
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
       uses: jenseng/dynamic-uses@v1
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/preview@${{ env.action-version }}
+        uses: ${{ env.action-root }}/preview
         with: |-
           {
             "github-token": "${{ inputs.github-token }}",
@@ -136,10 +131,9 @@ runs:
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' && (inputs.include-preview == 'true' || inputs.ci-project != '') }}
       uses: jenseng/dynamic-uses@v1
       env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
         default-include-preview: ${{ fromJSON('["false","true"]')[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/finish@${{ env.action-version }}
+        uses: ${{ env.action-root }}/finish
         with: |-
           {
             "github-token": "${{ inputs.github-token }}",
@@ -150,10 +144,8 @@ runs:
     - name: Stop Ephemeral Instance
       if: ${{ !inputs.skip-preview-stop && inputs.state-action == 'stop' && inputs.state-backend == 'preview' }}
       uses: jenseng/dynamic-uses@v1
-      env:
-        action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
       with:
-        uses: LocalStack/setup-localstack/ephemeral/shutdown@${{ env.action-version }}
+        uses: ${{ env.action-root }}/ephemeral/shutdown
         with: |-
           {
             "name": "${{ inputs.github-token }}",

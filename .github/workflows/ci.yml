@@ -19,15 +19,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # We must hack the action call as remote to be able to use the relative paths
       - name: Start LocalStack
-        uses: ./
+        uses: jenseng/dynamic-uses@v1
         with:
-          image-tag: 'latest'
-          install-awslocal: 'true'
-          configuration: DEBUG=1
-          use-pro: 'true'
+          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          with: |-
+            {
+              "image-tag": "latest",
+              "install-awslocal": "true",
+              "configuration": "DEBUG=1",
+              "use-pro": "true",
+            }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
       - name: Run Tests against LocalStack
         run: |
@@ -43,13 +49,19 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: ./
+        uses: jenseng/dynamic-uses@v1
         with:
-          image-tag: 'latest'
-          install-awslocal: 'true'
-          use-pro: 'true'
+          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          with: |-
+            {
+              "image-tag": "latest",
+              "install-awslocal": "true",
+              "configuration": "DEBUG=1",
+              "use-pro": "true",
+            }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
       - name: Run AWS commands
         run: |
@@ -57,13 +69,18 @@ jobs:
           awslocal sqs create-queue --queue-name test-queue
 
       - name: Save the Cloud Pod 
-        uses: ./
+        uses: jenseng/dynamic-uses@v1
         with:
-          state-name: cloud-pods-test
-          state-action: save
-          skip-startup: 'true'
+          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          with: |-
+            {
+              "state-name": "cloud-pods-test",
+              "state-action": "save",
+              "skip-startup": "true",
+            }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
   local-state-test:
     name: 'Test Local State Action'
@@ -73,25 +90,36 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: ./
+        uses: jenseng/dynamic-uses@v1
         with:
-          image-tag: 'latest'
-          install-awslocal: 'true'
-          use-pro: 'true'
+          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          with: |-
+            {
+              "image-tag": "latest",
+              "install-awslocal": "true",
+              "configuration": "DEBUG=1",
+              "use-pro": "true",
+            }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
       - name: Run AWS commands
         run: |
           awslocal s3 mb s3://test
           awslocal sqs create-queue --queue-name test-queue
 
-      - name: Save the State into Artifact
-        uses: ./
+      - name: Save the Cloud Pod 
+        uses: jenseng/dynamic-uses@v1
         with:
-          state-name: state-test
-          state-action: save
-          state-backend: local
-          skip-startup: 'true'
+          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          with: |-
+            {
+              "state-name": "cloud-pods-test",
+              "state-action": "save",
+              "state-backend": "local",
+              "skip-startup": "true",
+            }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
