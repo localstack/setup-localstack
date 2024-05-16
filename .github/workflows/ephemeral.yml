@@ -10,13 +10,21 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Deploy Preview
-        uses: ./preview
+        uses: ./
         with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          state-backend: preview
+          state-action: start
+          skip-preview-stop: 'true'
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           
+      # We want explicit shutdown
       - name: Shutdown ephemeral instance
-        uses: ./ephemeral/shutdown
+        uses: ./
         with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          state-backend: preview
+          state-action: stop
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
