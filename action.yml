@@ -51,11 +51,16 @@ runs:
       run: |
         pip install pyopenssl -U
 
+        LS_IMAGE_STUB="localstack/localstack"
+        if [ "x${CODEBUILD_BUILD_ID}" != "x" ]; then
+          LS_IMAGE_STUB="public.ecr.aws/${LS_IMAGE_STUB}"
+        fi
+
         if [ "$USE_PRO" = true ]; then
-          docker pull localstack/localstack-pro:"$IMAGE_TAG" &
+          docker pull ${LS_IMAGE_STUB}-pro:"$IMAGE_TAG" &
           CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
         else
-          docker pull localstack/localstack:"$IMAGE_TAG" &
+          docker pull ${LS_IMAGE_STUB}:"$IMAGE_TAG" &
         fi
 
         pip install localstack
