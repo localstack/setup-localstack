@@ -52,7 +52,7 @@ runs:
     - name: Start LocalStack
       run: |
         if [ "$USE_PRO" = true ]; then
-          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" || "x$LOCALSTACK_API_KEY" = "x" ]; then
+          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
             echo "WARNING: LocalStack API key not detected, please verify your configuration..."
           fi
           docker pull localstack/localstack-pro:"$IMAGE_TAG" &
