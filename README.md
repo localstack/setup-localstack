@@ -82,15 +82,20 @@ To load an already saved state:
 
 | Input              | Description                                                                      | Default  |
 | ------------------ | -------------------------------------------------------------------------------- | -------- |
-| `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
-| `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
+| `ci-project`          | Name of the CI project to track in LocalStack Cloud |  |
 | `configuration`    | Configuration variables to use while starting LocalStack container               | `None`   |
-| `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
+| `github-token`          | Github token used to create PR comments |  |
+| `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
+| `include-preview`          | Whether to include the created preview URL in the PR comment |  |
+| `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
+| `preview-cmd`          | Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL) |  |
+| `skip-preview-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
 | `skip-startup`     | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance. | `false`  |
 | `skip-wait`        | Skip wait for LocalStack to start up | `false`  |
-| `state-action`     | Manage LocalStack state. Valid values are `load`, `save`, `` (empty, do not manage state).  | `` |
-| `state-backend`    | Either store the state of LocalStack locally or as a cloud pod. Valid values are `cloud-pods` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
+| `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `` |
+| `state-backend`    | Either store the state of LocalStack locally or as a cloud pod. Valid values are `cloud-pods`, `preview` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
+| `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
 
 ### Example workflow
 ```yml
@@ -133,7 +138,6 @@ jobs:
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           WORKFLOW_ID: ${{ env.MY_GOLDEN_LS_STATE }}
-          # Alternatively just configure a repo variable with the `WORKFLOW_ID` name
 ```
 
 ## License
