@@ -6,13 +6,13 @@ inputs:
     required: true
   localstack-api-key:
     description: 'LocalStack API key used to create the preview environment'
-    required: true
+    required: false
   preview-cmd:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
     default: ''
   auto-load-pod:
-    description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
+    description: 'The pod to load on startup of LocalStack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
 
@@ -38,9 +38,9 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
-            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
-            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
+        response=$(curl -X POST -d '{"auto_load_pod": "${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"}' \
+            -H 'ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}' \
+            -H 'authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}' \
             -H 'content-type: application/json' \
             https://api.localstack.cloud/v1/previews/$previewName)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
@@ -61,6 +61,7 @@ runs:
         path: ./ls-preview-url.txt
 
     - name: Run preview deployment
+      if: ${{ inputs.preview-cmd != '' }}
       shell: bash
       run:
         ${{ inputs.preview-cmd }}
