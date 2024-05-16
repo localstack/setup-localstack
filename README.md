@@ -86,7 +86,7 @@ To load an already saved state:
 | `configuration`    | Configuration variables to use while starting LocalStack container               | `None`   |
 | `github-token`          | Github token used to create PR comments |  |
 | `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
-| `include-preview`          | Whether to include the created preview URL in the PR comment |  |
+| `include-preview`          | Whether to include the created preview URL in the PR comment | `false` |
 | `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
 | `preview-cmd`          | Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL) |  |
 | `skip-preview-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
