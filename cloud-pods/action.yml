@@ -20,7 +20,7 @@ runs:
           localstack pod save $NAME
         elif [ "$ACTION" = "load" ]; then
           echo "Loading Cloud Pod $NAME"
-          localstack pod load $NAME
+          localstack pod load --yes $NAME
         else
           echo "Invalid action: $ACTION"
           exit 1
