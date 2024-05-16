@@ -1,7 +1,13 @@
 name: LocalStack Test
 on:
   push:
+    paths-ignore:
+      - ./*.md
+      - LICENSE
   pull_request:
+    paths-ignore:
+      - ./*.md
+      - LICENSE
   workflow_dispatch:
   schedule:
     - cron: '48 23 * * 0'
