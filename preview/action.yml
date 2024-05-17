@@ -38,10 +38,10 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d '{"auto_load_pod": "${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"}' \
-            -H 'ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}' \
-            -H 'authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}' \
-            -H 'content-type: application/json' \
+        response=$(curl -X POST -d "{\"auto_load_pod\": \"${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}\"}" \
+            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "content-type: application/json" \
             https://api.localstack.cloud/v1/previews/$previewName)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
