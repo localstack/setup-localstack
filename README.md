@@ -14,7 +14,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ## Usage
 
-To get started, you can use this minimal example:
+### Get started minimal example
 
 ```yml
 - name: Start LocalStack
@@ -28,7 +28,7 @@ To get started, you can use this minimal example:
 > **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set if `use-pro` is set to `true`.  
 If the key is not found LocalStack by default falls back to the CE edition and displays a warning.
 
-To install only CLIs and startup later:
+### Install only CLIs and startup later
 ```yml
 - name: Install LocalStack CLIs
   uses: LocalStack/setup-localstack@v0.2.0
@@ -46,7 +46,7 @@ To install only CLIs and startup later:
     LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 ```
 
-To save a state later on in the pipeline:
+### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
   uses: LocalStack/setup-localstack@v0.2.0
@@ -61,7 +61,7 @@ To save a state later on in the pipeline:
 ```
 > **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to save/load LocalStack's state either as a Cloud Pod or an artifact.
 
-To load an already saved state:
+### Load an already saved state
 ```yml
 - name: Start LocalStack and Load State
   uses: LocalStack/setup-localstack@v0.2.0
@@ -77,8 +77,30 @@ To load an already saved state:
 
 > **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or an artifact.
 
+### Manage App Preview
+```yml
+uses: LocalStack/setup-localstack@$v0.2.0
+  with:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+      state-backend: preview
+      state-action: start
+      skip-preview-stop: 'true' # Adding this option prevents 
+  env:
+    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
-### Inputs
+...
+
+with:
+  uses: LocalStack/setup-localstack@${{ env.action-version }}
+  with:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+      state-backend: preview
+      state-action: stop
+  env:
+    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+```
+
+## Inputs
 
 | Input              | Description                                                                      | Default  |
 | ------------------ | -------------------------------------------------------------------------------- | -------- |
@@ -97,7 +119,7 @@ To load an already saved state:
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
 | `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
 
-### Example workflow
+## Example workflow
 ```yml
 name: LocalStack Test
 on: [ push, pull_request ]
