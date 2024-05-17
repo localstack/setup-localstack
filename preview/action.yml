@@ -19,12 +19,18 @@ inputs:
 runs:
   using: composite
   steps:
+    - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+      shell: bash
+
     - name: Initial PR comment
-      # TODO: potentially replace with Action version number over time
-      uses: LocalStack/setup-localstack/prepare@main
       if: inputs.github-token
+      uses: jenseng/dynamic-uses@v1
       with:
-        github-token: ${{ inputs.github-token }}
+        uses: ${{ env.action-root }}/prepare
+        with: |-
+          {
+            "github-token": "${{ inputs.github-token }}"
+          }
 
     - name: Download PR artifact
       uses: actions/download-artifact@v3

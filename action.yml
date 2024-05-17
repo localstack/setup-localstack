@@ -72,6 +72,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: echo "$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)"
+      shell: bash
+
     - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
       shell: bash
     
