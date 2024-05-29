@@ -106,18 +106,6 @@ runs:
             "skip-wait": "${{ inputs.skip-wait }}"
           }
 
-    # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
-    - name: Manage state
-      if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
-      uses: jenseng/dynamic-uses@v1
-      with:
-        uses: ${{ env.action-root }}/${{ inputs.state-backend }}
-        with: |-
-          {
-            "name": "${{ inputs.state-name }}",
-            "action": "${{ inputs.state-action }}"
-          }
-
     - name: Create Ephemeral Instance
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
       uses: jenseng/dynamic-uses@v1
@@ -128,6 +116,18 @@ runs:
             "github-token": "${{ inputs.github-token }}",
             "preview-cmd": "${{ inputs.preview-cmd }}",
             "auto-load-pod": "${{ inputs.state-name }}"
+          }
+
+    # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
+    - name: Manage state
+      if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
+      uses: jenseng/dynamic-uses@v1
+      with:
+        uses: ${{ env.action-root }}/${{ inputs.state-backend }}
+        with: |-
+          {
+            "name": "${{ inputs.state-name }}",
+            "action": "${{ inputs.state-action }}"
           }
 
     - name: Display Ephemeral Instance URL
