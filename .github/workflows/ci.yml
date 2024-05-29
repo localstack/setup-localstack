@@ -34,7 +34,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' ? github.ref_name : github.head_ref }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Run Tests against LocalStack
         run: |
@@ -62,7 +62,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Run AWS commands
         run: |
@@ -81,7 +81,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
   local-state-test:
     name: 'Test Local State Action'
@@ -103,7 +103,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Run AWS commands
         run: |
@@ -123,4 +123,4 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}

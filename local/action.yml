@@ -17,7 +17,7 @@ runs:
       uses: dawidd6/action-download-artifact@v2
       if: ${{ inputs.action == 'load' }}
       env:
-        workflow_id: ${{ fromJSON(format('["{0}","{1}"]', env.WORKFLOW_ID, github.event.workflow_run.workflow_id))[env.WORKFLOW_ID == ''] }} 
+        workflow_id: ${{ env.WORKFLOW_ID == '' && github.event.workflow_run.workflow_id || env.WORKFLOW_ID }} 
       with:
         workflow: 
         name: ${{ inputs.name }}
