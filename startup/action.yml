@@ -37,13 +37,13 @@ runs:
     #   with:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
-    - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+    - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
       shell: bash
 
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
       with:
-        uses: ${{ env.action-root }}/tools
+        uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
           {
             "install-awslocal": "${{ inputs.install-awslocal }}",

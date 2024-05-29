@@ -24,7 +24,7 @@ jobs:
       - name: Start LocalStack
         uses: jenseng/dynamic-uses@v1
         with:
-          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "image-tag": "latest",
@@ -34,7 +34,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' ? github.ref_name : github.head_ref }}
 
       - name: Run Tests against LocalStack
         run: |
@@ -52,7 +52,7 @@ jobs:
       - name: Start LocalStack
         uses: jenseng/dynamic-uses@v1
         with:
-          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "image-tag": "latest",
@@ -62,7 +62,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
       - name: Run AWS commands
         run: |
@@ -72,7 +72,7 @@ jobs:
       - name: Save the Cloud Pod 
         uses: jenseng/dynamic-uses@v1
         with:
-          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "state-name": "cloud-pods-test",
@@ -81,7 +81,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
   local-state-test:
     name: 'Test Local State Action'
@@ -93,7 +93,7 @@ jobs:
       - name: Start LocalStack
         uses: jenseng/dynamic-uses@v1
         with:
-          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "image-tag": "latest",
@@ -103,7 +103,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
 
       - name: Run AWS commands
         run: |
@@ -113,7 +113,7 @@ jobs:
       - name: Save the Cloud Pod 
         uses: jenseng/dynamic-uses@v1
         with:
-          uses: LocalStack/setup-localstack@${{ env.action-version }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "state-name": "cloud-pods-test",
@@ -123,4 +123,4 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          action-version: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}
+          GH_ACTION_VERSION: ${{ fromJSON(format('["{0}","{1}"]', github.ref_name, github.head_ref))[github.event_name == 'pull_request'] }}

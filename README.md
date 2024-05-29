@@ -94,7 +94,7 @@ uses: LocalStack/setup-localstack@$v0.2.0
 ...
 
 with:
-  uses: LocalStack/setup-localstack@${{ env.action-version }}
+  uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: preview

@@ -75,14 +75,14 @@ runs:
     - run: echo "$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)"
       shell: bash
 
-    - run: echo "action-root=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+    - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
       shell: bash
     
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
       if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'preview' }}
       with:
-        uses: ${{ env.action-root }}/tools
+        uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
           {
             "install-awslocal": "${{ inputs.install-awslocal }}",
@@ -93,7 +93,7 @@ runs:
       if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'preview' }}
       with:
         # now we can dynamically determine sub-action path 🥳
-        uses: ${{ env.action-root }}/startup
+        uses: ${{ env.GH_ACTION_ROOT }}/startup
         # the `with` needs to be converted to a valid json string
         # keeping in there install-awslocal for backward compatibility
         with: |-
@@ -110,7 +110,7 @@ runs:
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
       uses: jenseng/dynamic-uses@v1
       with:
-        uses: ${{ env.action-root }}/preview
+        uses: ${{ env.GH_ACTION_ROOT }}/preview
         with: |-
           {
             "github-token": "${{ inputs.github-token }}",
@@ -123,7 +123,7 @@ runs:
       if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
       uses: jenseng/dynamic-uses@v1
       with:
-        uses: ${{ env.action-root }}/${{ inputs.state-backend }}
+        uses: ${{ env.GH_ACTION_ROOT }}/${{ inputs.state-backend }}
         with: |-
           {
             "name": "${{ inputs.state-name }}",
@@ -136,7 +136,7 @@ runs:
       env:
         default-include-preview: ${{ fromJSON('["false","true"]')[github.event_name == 'pull_request'] }}
       with:
-        uses: ${{ env.action-root }}/finish
+        uses: ${{ env.GH_ACTION_ROOT }}/finish
         with: |-
           {
             "github-token": "${{ inputs.github-token }}",
@@ -148,7 +148,7 @@ runs:
       if: ${{ !inputs.skip-preview-stop && inputs.state-action == 'stop' && inputs.state-backend == 'preview' }}
       uses: jenseng/dynamic-uses@v1
       with:
-        uses: ${{ env.action-root }}/ephemeral/shutdown
+        uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown
         with: |-
           {
             "name": "${{ inputs.github-token }}",
