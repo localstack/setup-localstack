@@ -14,7 +14,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ## Usage
 
-### Get started minimal example
+### Get started with a minimal example
 
 ```yml
 - name: Start LocalStack
@@ -59,7 +59,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
   env:
     LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 ```
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to save/load LocalStack's state either as a Cloud Pod or an artifact.
+> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to save/load LocalStack's state either as a Cloud Pod or as a file artifact.
 
 ### Load an already saved state
 ```yml
@@ -75,7 +75,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ```
 > **NOTE**: To load a **local state** from a different GitHub Actions workflow, one must set the `WORKFLOW_ID` environment variable.
 
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or an artifact.
+> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or as a file artifact.
 
 ### Manage App Preview
 ```yml
@@ -84,7 +84,10 @@ uses: LocalStack/setup-localstack@$v0.2.0
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: preview
       state-action: start
-      skip-preview-stop: 'true' # Adding this option prevents 
+      # Adding this option prevents Ephemeral Instance to be stopped after the `preview-cmd` run
+      skip-preview-stop: 'true'
+      # Optional script/command to run
+      preview-cmd: deploy.sh
   env:
     LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
 
@@ -110,10 +113,10 @@ with:
 | `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
 | `include-preview`          | Whether to include the created preview URL in the PR comment | `false` |
 | `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
-| `preview-cmd`          | Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL) |  |
+| `preview-cmd`          | Command(s) used to create a preview of the PR (can use `$AWS_ENDPOINT_URL`) |  |
 | `skip-preview-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
 | `skip-startup`     | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance. | `false`  |
-| `skip-wait`        | Skip wait for LocalStack to start up | `false`  |
+| `skip-wait`        | Skip waiting for LocalStack to start up | `false`  |
 | `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `` |
 | `state-backend`    | Either store the state of LocalStack locally or as a cloud pod. Valid values are `cloud-pods`, `preview` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
