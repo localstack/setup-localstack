@@ -77,7 +77,6 @@ jobs:
             {
               "state-name": "cloud-pods-test",
               "state-action": "save",
-              "skip-startup": "true",
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
@@ -119,7 +118,6 @@ jobs:
               "state-name": "cloud-pods-test",
               "state-action": "save",
               "state-backend": "local",
-              "skip-startup": "true",
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}

@@ -32,10 +32,10 @@ inputs:
     required: false
     default: ''
   preview-cmd:
-    description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
+    description: 'Command(s) used to create an Ephemeral Instance of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
   include-preview:
-    description: 'Whether to include the created preview URL in the PR comment'
+    description: 'Whether to include the created Ephemeral Instance URL in the PR comment'
     required: false
   skip-startup:
     description: |
@@ -47,7 +47,7 @@ inputs:
     description: 'Skip wait for LocalStack'
     required: false
     default: 'false'
-  skip-preview-stop:
+  skip-ephemeral-stop:
     description: 'Skip stopping LocalStack Ephemeral Instance'
     required: false
     default: 'false'
@@ -55,13 +55,13 @@ inputs:
     description: |
       Manage LocalStack state
       Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state)
-      Values `start`/`stop` only usable with app previews.
+      Values `start`/`stop` only usable with Ephemeral Instances.
     required: false
     default: ''
   state-backend:
     description: |
-      Either store the state of LocalStack locally or as a cloud pod.
-      Valid values are `cloud-pods`, `preview` or `local`.
+      Either store the state of LocalStack locally, as a cloud pod or start up an ephemeral instance.
+      Valid values are `cloud-pods`, `ephemeral` or `local`.
       Use this option in unison with `state-action` to control behaviour.
     required: false
     default: 'cloud-pods'
@@ -80,7 +80,7 @@ runs:
     
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
-      if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'preview' }}
+      if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'preview' || inputs.state-action == 'save' }}
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
@@ -90,7 +90,7 @@ runs:
 
     - name: Start Localstack
       uses: jenseng/dynamic-uses@v1
-      if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'preview' }}
+      if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'preview' && inputs.state-action != 'save' }}
       with:
         # now we can dynamically determine sub-action path 🥳
         uses: ${{ env.GH_ACTION_ROOT }}/startup
@@ -107,10 +107,10 @@ runs:
           }
 
     - name: Create Ephemeral Instance
-      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' }}
+      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' }}
       uses: jenseng/dynamic-uses@v1
       with:
-        uses: ${{ env.GH_ACTION_ROOT }}/preview
+        uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/startup
         with: |-
           {
             "github-token": "${{ inputs.github-token }}",
@@ -131,7 +131,7 @@ runs:
           }
 
     - name: Display Ephemeral Instance URL
-      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'preview' && (inputs.include-preview == 'true' || inputs.ci-project != '') }}
+      if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' && (inputs.include-preview == 'true' || inputs.ci-project != '') }}
       uses: jenseng/dynamic-uses@v1
       env:
         default-include-preview: ${{ fromJSON('["false","true"]')[github.event_name == 'pull_request'] }}
@@ -141,11 +141,11 @@ runs:
           {
             "github-token": "${{ inputs.github-token }}",
             "ci-project": "${{ inputs.ci-project }}",
-            "include-preview": "${{ fromJSON(format('["{0}","{1}"]', env.include-preview, inputs.include-preview))[inputs.include-preview != ''] }}"
+            "include-preview": "${{ inputs.include-preview != '' && inputs.include-preview || env.include-preview }}"
           }
     
     - name: Stop Ephemeral Instance
-      if: ${{ !inputs.skip-preview-stop && inputs.state-action == 'stop' && inputs.state-backend == 'preview' }}
+      if: ${{ !inputs.skip-ephemeral-stop && inputs.state-action == 'stop' && inputs.state-backend == 'ephemeral' }}
       uses: jenseng/dynamic-uses@v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown

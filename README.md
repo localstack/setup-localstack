@@ -52,7 +52,6 @@ If the key is not found LocalStack by default falls back to the CE edition and d
   uses: LocalStack/setup-localstack@v0.2.0
   with:
     install-awslocal: 'true'
-    skip-startup: 'true'
     state-backend: cloud-pods
     state-action: save
     state-name: my-cloud-pod
@@ -156,7 +155,6 @@ jobs:
       - name: Save LocalStack State
         uses: LocalStack/setup-localstack@v0.2.0
         with:
-          skip-startup: 'true'
           state-backend: local
           state-action: save
           state-name: my-ls-state-artifact
