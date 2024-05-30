@@ -9,16 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Deploy Preview
+      - name: Deploy Ephemeral Instance
         uses: jenseng/dynamic-uses@v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
               "github-token": "${{ secrets.GITHUB_TOKEN }}",
-              "state-backend": "preview",
+              "state-backend": "ephemeral",
               "state-action": "start",
-              "skip-preview-stop": "true"
+              "skip-ephemeral-stop": "true"
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
@@ -32,7 +32,7 @@ jobs:
           with: |-
             {
               "github-token": "${{ secrets.GITHUB_TOKEN }}",
-              "state-backend": "preview",
+              "state-backend": "ephemeral",
               "state-action": "stop"
             }
         env:

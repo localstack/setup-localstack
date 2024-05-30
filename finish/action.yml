@@ -8,10 +8,10 @@ inputs:
     description: 'Name of the CI project tracked in LocalStack Cloud'
     required: false
   include-preview:
-    description: 'Whether to include the created preview URL in the PR comment'
+    description: 'Whether to include the created Ephemeral Instance URL in the PR comment'
     required: false
   preview-url:
-    description: 'The preview url to include in the PR comment'
+    description: 'The Ephmeral Instance URL to include in the PR comment'
     required: false
 
 runs:
@@ -28,7 +28,7 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
-    - name: Load the preview URL
+    - name: Load the Ephemeral Instance URL
       shell: bash
       if: inputs.include-preview
       run: |

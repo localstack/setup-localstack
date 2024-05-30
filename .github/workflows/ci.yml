@@ -36,7 +36,7 @@ jobs:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
-      - name: Run Tests against LocalStack
+      - name: Run Tests Against LocalStack
         run: |
           awslocal s3 mb s3://test
           awslocal s3 ls
@@ -104,12 +104,12 @@ jobs:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
-      - name: Run AWS commands
+      - name: Run AWS Commands
         run: |
           awslocal s3 mb s3://test
           awslocal sqs create-queue --queue-name test-queue
 
-      - name: Save the Cloud Pod 
+      - name: Save the State Artifact
         uses: jenseng/dynamic-uses@v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}

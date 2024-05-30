@@ -80,7 +80,7 @@ runs:
     
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
-      if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'preview' || inputs.state-action == 'save' }}
+      if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'ephemeral' || inputs.state-action == 'save' }}
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
@@ -90,7 +90,7 @@ runs:
 
     - name: Start Localstack
       uses: jenseng/dynamic-uses@v1
-      if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'preview' && inputs.state-action != 'save' }}
+      if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'ephemeral' && inputs.state-action != 'save' }}
       with:
         # now we can dynamically determine sub-action path 🥳
         uses: ${{ env.GH_ACTION_ROOT }}/startup
