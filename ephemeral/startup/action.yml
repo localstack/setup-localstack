@@ -6,25 +6,31 @@ inputs:
     required: true
   localstack-api-key:
     description: 'LocalStack API key used to create the preview environment'
-    required: true
+    required: false
   preview-cmd:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
     required: false
     default: ''
   auto-load-pod:
-    description: 'The pod to load on startup of localstack, the env var AUTO_LOAD_POD'
+    description: 'The pod to load on startup of LocalStack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
 
 runs:
   using: composite
   steps:
+    - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+      shell: bash
+
     - name: Initial PR comment
-      # TODO: potentially replace with Action version number over time
-      uses: LocalStack/setup-localstack/prepare@main
       if: inputs.github-token
+      uses: jenseng/dynamic-uses@v1
       with:
-        github-token: ${{ inputs.github-token }}
+        uses: ${{ env.GH_ACTION_ROOT }}/prepare
+        with: |-
+          {
+            "github-token": "${{ inputs.github-token }}"
+          }
 
     - name: Download PR artifact
       uses: actions/download-artifact@v3
@@ -38,10 +44,10 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d '{"auto_load_pod": "${{ inputs.auto-load-pod }}"}' \
-            -H 'ls-api-key: ${{ inputs.localstack-api-key }}' \
-            -H 'authorization: token ${{ inputs.localstack-api-key }}' \
-            -H 'content-type: application/json' \
+        response=$(curl -X POST -d "{\"auto_load_pod\": \"${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}\"}" \
+            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "content-type: application/json" \
             https://api.localstack.cloud/v1/previews/$previewName)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
@@ -61,6 +67,7 @@ runs:
         path: ./ls-preview-url.txt
 
     - name: Run preview deployment
+      if: ${{ inputs.preview-cmd != '' }}
       shell: bash
       run:
         ${{ inputs.preview-cmd }}

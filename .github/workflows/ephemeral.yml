@@ -9,14 +9,32 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Deploy Preview
-        uses: ./preview
+      - name: Deploy Ephemeral Instance
+        uses: jenseng/dynamic-uses@v1
         with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "github-token": "${{ secrets.GITHUB_TOKEN }}",
+              "state-backend": "ephemeral",
+              "state-action": "start",
+              "skip-ephemeral-stop": "true"
+            }
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
           
+      # We want explicit shutdown
       - name: Shutdown ephemeral instance
-        uses: ./ephemeral/shutdown
+        uses: jenseng/dynamic-uses@v1
         with:
-          localstack-api-key: ${{ secrets.LOCALSTACK_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "github-token": "${{ secrets.GITHUB_TOKEN }}",
+              "state-backend": "ephemeral",
+              "state-action": "stop"
+            }
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}

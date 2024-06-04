@@ -1,0 +1,78 @@
+name: 'Start up Localstack'
+
+inputs:
+  image-tag:
+    description: 'Tag of the LocalStack Docker image to use'
+    required: true
+    default: 'latest'
+  install-awslocal:
+    description: 'Whether to install the `awslocal` CLI into the environment'
+    required: true
+    default: 'true'
+  use-pro:
+    description: 'Whether to use LocalStack Pro (requires a valid API key)'
+    required: false
+    default: 'false'
+  configuration:
+    description: 'Configuration variables to use for LocalStack'
+    required: false
+    default: ''
+  ci-project:
+    description: 'Name of the CI project to track in LocalStack Cloud'
+    required: false
+    default: ''
+  skip-wait:
+    description: 'Skip wait for LocalStack'
+    required: false
+    default: 'false'
+
+runs:
+  using: "composite"
+  steps:
+    # # NOTE: Thinking about this if we need it
+    # - name: Initial PR comment
+    #   # TODO: potentially replace with Action version number over time
+    #   uses: LocalStack/setup-localstack/prepare@main
+    #   if: inputs.ci-project && inputs.github-token
+    #   with:
+    #     github-token: ${{ inputs.github-token }}
+    #     ci-project: ${{ inputs.ci-project }}
+    - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Install tools
+      uses: jenseng/dynamic-uses@v1
+      with:
+        uses: ${{ env.GH_ACTION_ROOT }}/tools
+        with: |-
+          {
+            "install-awslocal": "${{ inputs.install-awslocal }}",
+          }
+
+    - name: Start LocalStack
+      run: |
+        if [ "$USE_PRO" = true ]; then
+          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
+            echo "WARNING: LocalStack API key not detected, please verify your configuration..."
+          fi
+          docker pull localstack/localstack-pro:"$IMAGE_TAG" &
+          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
+        else
+          docker pull localstack/localstack:"$IMAGE_TAG" &
+        fi
+
+        export CI_PROJECT=${{ inputs.ci-project }}
+        eval "${CONFIGURATION} localstack start -d"
+
+        if [ "$SKIP_WAIT" = false ]; then
+          localstack wait -t ${LS_WAIT_TIMEOUT:-30}  # Let users configure the timeout via env variable
+        fi
+
+      shell: bash
+      env:
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        INSTALL_AWSLOCAL: ${{ inputs.install-awslocal }}
+        USE_PRO: ${{ inputs.use-pro }}
+        CONFIGURATION: ${{ inputs.configuration }}
+        SKIP_WAIT: ${{ inputs.skip-wait }}
+
