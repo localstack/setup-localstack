@@ -11,6 +11,7 @@ runs:
   steps:
     - name: Start LocalStack
       run: |
+        pip install --upgrade pip
         which localstack > /dev/null || pip install localstack
         if [ "$INSTALL_AWSLOCAL" = true ]; then
           which awslocal > /dev/null || pip install awscli-local[ver1]

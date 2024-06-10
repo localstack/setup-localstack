@@ -43,7 +43,7 @@ jobs:
           echo "Test Execution complete!"
 
   localstack-action-version-test:
-    name: 'Test LocalStack GitHub Action'
+    name: 'Test LocalStack Version with Github Actions'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -65,9 +65,10 @@ jobs:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
-      - name: Run Tests Against LocalStack
+      - name: Run Version Test Against LocalStack
         run: |
-          exit $(test "x$(docker ps | grep localstack | cut -d " " -f4 | cut -d ":" -f2)" = "x3.2.0")
+          LS_VERSION=$(docker ps | grep localstack | cut -d " " -f4 | cut -d ":" -f2)
+          exit $(test "x${LS_VERSION}" = "x3.2.0")
 
   cloud-pods-test:
     name: 'Test Cloud Pods Action'
