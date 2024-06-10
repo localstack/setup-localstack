@@ -29,7 +29,7 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/prepare
         with: |-
           {
-            "github-token": "${{ inputs.github-token }}"
+            "github-token": ${{ toJSON(inputs.github-token) }}
           }
 
     - name: Download PR artifact

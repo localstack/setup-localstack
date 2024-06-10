@@ -85,7 +85,7 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
           {
-            "install-awslocal": "${{ inputs.install-awslocal }}",
+            "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
           }
 
     - name: Start Localstack
@@ -98,12 +98,12 @@ runs:
         # keeping in there install-awslocal for backward compatibility
         with: |-
           {
-            "image-tag": "${{ inputs.image-tag }}",
-            "install-awslocal": "${{ inputs.install-awslocal }}",
-            "use-pro": "${{ inputs.use-pro }}",
-            "configuration": "${{ inputs.configuration }}",
-            "ci-project": "${{ inputs.ci-project }}",
-            "skip-wait": "${{ inputs.skip-wait }}"
+            "image-tag": ${{ toJSON(inputs.image-tag) }},
+            "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
+            "use-pro": ${{ toJSON(inputs.use-pro) }},
+            "configuration": ${{ toJSON(inputs.configuration) }},
+            "ci-project": ${{ toJSON(inputs.ci-project) }},
+            "skip-wait": ${{ toJSON(inputs.skip-wait) }}
           }
 
     - name: Create Ephemeral Instance
@@ -113,9 +113,9 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/startup
         with: |-
           {
-            "github-token": "${{ inputs.github-token }}",
-            "preview-cmd": "${{ inputs.preview-cmd }}",
-            "auto-load-pod": "${{ inputs.state-name }}"
+            "github-token": ${{ toJSON(inputs.github-token) }},
+            "preview-cmd": ${{ toJSON(inputs.preview-cmd) }},
+            "auto-load-pod": ${{ toJSON(inputs.state-name) }}
           }
 
     # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
@@ -126,8 +126,8 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/${{ inputs.state-backend }}
         with: |-
           {
-            "name": "${{ inputs.state-name }}",
-            "action": "${{ inputs.state-action }}"
+            "name": ${{ toJSON(inputs.state-name) }},
+            "action": ${{ toJSON(inputs.state-action) }}
           }
 
     - name: Display Ephemeral Instance URL
@@ -139,9 +139,9 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/finish
         with: |-
           {
-            "github-token": "${{ inputs.github-token }}",
-            "ci-project": "${{ inputs.ci-project }}",
-            "include-preview": "${{ inputs.include-preview != '' && inputs.include-preview || env.include-preview }}"
+            "github-token": ${{ toJSON(inputs.github-token) }},
+            "ci-project": ${{ toJSON(inputs.ci-project) }},
+            "include-preview": ${{ inputs.include-preview != '' && toJSON(inputs.include-preview) || toJSON(env.include-preview) }}
           }
     
     - name: Stop Ephemeral Instance
@@ -151,5 +151,5 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown
         with: |-
           {
-            "name": "${{ inputs.github-token }}",
+            "name": ${{ toJSON(inputs.github-token) }},
           }
