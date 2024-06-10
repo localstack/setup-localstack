@@ -55,12 +55,14 @@ runs:
           if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
             echo "WARNING: LocalStack API key not detected, please verify your configuration..."
           fi
-          docker pull localstack/localstack-pro:"$IMAGE_TAG" &
-          CONFIGURATION="$CONFIGURATION DNS_ADDRESS=127.0.0.1"
+          CONFIGURATION="DNS_ADDRESS=127.0.0.1 ${CONFIGURATION}"
+          IMAGE_NAME="${IMAGE_NAME:-localstack/localstack-pro:${IMAGE_TAG}}"
         else
-          docker pull localstack/localstack:"$IMAGE_TAG" &
+          IMAGE_NAME="${IMAGE_NAME:-localstack/localstack:${IMAGE_TAG}}"
         fi
 
+        CONFIGURATION="IMAGE_NAME=${IMAGE_NAME} ${CONFIGURATION}"
+        docker pull ${IMAGE_NAME} &
         export CI_PROJECT=${{ inputs.ci-project }}
         eval "${CONFIGURATION} localstack start -d"
 
