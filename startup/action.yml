@@ -37,7 +37,16 @@ runs:
     #   with:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
-    - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
+    - run: >
+        echo "GH_ACTION_ROOT=$(
+          ls -d $(
+            ls -d ./../../_actions/* |
+            grep -i localstack |
+            tail -n1
+          )/setup-localstack/* | 
+          grep -v completed | 
+          tail -n1
+        )" >> $GITHUB_ENV
       shell: bash
 
     - name: Install tools
