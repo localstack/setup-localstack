@@ -133,8 +133,6 @@ runs:
     - name: Display Ephemeral Instance URL
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' && (inputs.include-preview == 'true' || inputs.ci-project != '') }}
       uses: jenseng/dynamic-uses@v1
-      env:
-        default-include-preview: ${{ fromJSON('["false","true"]')[github.event_name == 'pull_request'] }}
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/finish
         with: |-
