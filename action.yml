@@ -77,7 +77,7 @@ runs:
 
     - run: echo "GH_ACTION_ROOT=$(ls -d ./../../_actions/LocalStack/setup-localstack/* | grep -v completed)" >> $GITHUB_ENV
       shell: bash
-    
+
     - name: Install tools
       uses: jenseng/dynamic-uses@v1
       if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'ephemeral' || inputs.state-action == 'save' }}
