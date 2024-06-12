@@ -15,14 +15,19 @@ jobs:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
-              "github-token": "${{ secrets.GITHUB_TOKEN }}",
+              "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
               "state-backend": "ephemeral",
               "state-action": "start",
-              "skip-ephemeral-stop": "true"
+              "skip-ephemeral-stop": "true",
+              "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }}
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          PREVIEW_CMD: |-
+            awslocal s3 mb s3://test-bucket
+            awslocal sqs create-queue --queue-name=test-queue
+            echo "Deploy is done."
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
@@ -31,7 +36,7 @@ jobs:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
-              "github-token": "${{ secrets.GITHUB_TOKEN }}",
+              "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
               "state-backend": "ephemeral",
               "state-action": "stop"
             }

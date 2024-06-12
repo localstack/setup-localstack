@@ -55,7 +55,7 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/tools
         with: |-
           {
-            "install-awslocal": "${{ inputs.install-awslocal }}",
+            "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
           }
 
     - name: Start LocalStack
