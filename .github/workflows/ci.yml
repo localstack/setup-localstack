@@ -127,6 +127,9 @@ jobs:
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
               "use-pro": "true",
+              "state-name": "cloud-pods-test",
+              "state-action": "load",
+              "state-backend": "local",
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
@@ -134,7 +137,9 @@ jobs:
 
       - name: Run AWS Commands
         run: |
+          awslocal s3 rb s3://test
           awslocal s3 mb s3://test
+          awslocal sqs delete-queue --queue-url $(awslocal sqs get-queue-url --queue-name test-queue --output text)
           awslocal sqs create-queue --queue-name test-queue
 
       - name: Save the State Artifact
