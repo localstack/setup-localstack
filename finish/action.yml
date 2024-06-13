@@ -18,10 +18,8 @@ runs:
   using: composite
   steps:
     - name: Download PR artifact
-      uses: dawidd6/action-download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
-        workflow: ${{ env.WORKFLOW_ID == '' && github.event.workflow_run.workflow_id || env.WORKFLOW_ID }}
-        workflow_conclusion: ${{ env.WORKFLOW_CONCLUSION }}
         name: pr
 
     - name: Load the PR ID
