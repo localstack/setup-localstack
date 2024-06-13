@@ -151,7 +151,7 @@ runs:
           }
     
     - name: Stop Ephemeral Instance
-      if: ${{ !inputs.skip-ephemeral-stop && inputs.state-action == 'stop' && inputs.state-backend == 'ephemeral' }}
+      if: ${{ inputs.skip-ephemeral-stop == 'false' && inputs.state-action == 'stop' && inputs.state-backend == 'ephemeral' }}
       uses: jenseng/dynamic-uses@v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown
