@@ -157,5 +157,5 @@ runs:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown
         with: |-
           {
-            "name": ${{ toJSON(inputs.github-token) }},
+            "github-token": ${{ toJSON(inputs.github-token) }},
           }
