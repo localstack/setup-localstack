@@ -28,7 +28,7 @@ runs:
     # If the above fails, try to get the latest pr artifact from the PR related workflows
     - name: Download latest PR artifact
       uses: dawidd6/action-download-artifact@v6
-      if: ${{ steps.get-pr-artifact.conclusion == 'failure' }}
+      if: ${{ steps.get-pr-artifact.outcome == 'failure' }}
       with:
         name: pr
         pr: ${{ github.event.pull_request.number }}
