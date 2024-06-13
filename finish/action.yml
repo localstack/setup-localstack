@@ -17,10 +17,23 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Download PR artifact
+    # Try to get pr artifact from current workflow
+    - name: Download current PR artifact
+      id: get-pr-artifact
       uses: actions/download-artifact@v3
+      continue-on-error: true
       with:
         name: pr
+
+    # If the above fails, try to get the latest pr artifact from the PR related workflows
+    - name: Download latest PR artifact
+      uses: dawidd6/action-download-artifact@v6
+      if: ${{ steps.get-pr-artifact.conclusion == 'failure' }}
+      with:
+        name: pr
+        pr: ${{ github.event.pull_request.number }}
+        # Can be ID or workflow file name, if empty falls back to the latest successful run of the current workflow
+        workflow: §{{ env.PR_ARTIFACT_WORKFLOW }}
 
     - name: Load the PR ID
       id: pr
