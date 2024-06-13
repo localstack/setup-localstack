@@ -33,7 +33,7 @@ runs:
         name: pr
         pr: ${{ github.event.pull_request.number }}
         # Can be ID or workflow file name, if empty falls back to the latest successful run of the current workflow
-        workflow: §{{ env.PR_ARTIFACT_WORKFLOW }}
+        workflow: ${{ env.PR_ARTIFACT_WORKFLOW }}
 
     - name: Load the PR ID
       id: pr
