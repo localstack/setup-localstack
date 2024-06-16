@@ -13,14 +13,23 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Download PR artifact
-      uses: dawidd6/action-download-artifact@v2
+    # Try to get pr artifact from current workflow
+    - name: Download current workflow's Local State artifact
+      id: get-state-artifact
       if: ${{ inputs.action == 'load' }}
-      env:
-        workflow_id: ${{ env.WORKFLOW_ID == '' && github.event.workflow_run.workflow_id || env.WORKFLOW_ID }} 
+      uses: actions/download-artifact@v3
+      continue-on-error: true
       with:
-        workflow: 
         name: ${{ inputs.name }}
+
+    # If the above fails, try to get the latest artifact from given workflow
+    - name: Download latest Local State artifact
+      uses: dawidd6/action-download-artifact@v6
+      if: ${{ inputs.action == 'load' && steps.get-state-artifact.outcome == 'failure' }}
+      with:
+        name: ${{ inputs.name }}
+        workflow: ${{ env.LS_STATE_ARTIFACT_WORKFLOW }} # Can be ID or workflow file name, if empty falls back to the latest successful run of the current workflow
+        if_no_artifact_found: warn
 
     - run: |
         if [ "$ACTION" = "save" ]; then
