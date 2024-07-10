@@ -15,6 +15,10 @@ inputs:
     description: 'The pod to load on startup of LocalStack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
+  extension-auto-install:
+    description: 'The extension(s) to automatically install onf startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
+    required: false
+  
 
 runs:
   using: composite
@@ -53,11 +57,11 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d "{\"auto_load_pod\": \"${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}\"}" \
+        response=$(curl -X POST -d "{'env_vars': {'auto_load_pod': '${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}', 'extension_auto_install': '${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}'}, 'instance_name': '${previewName}'}" \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/previews/$previewName)
+            https://api.localstack.cloud/v1/compute/instances/)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
           echo "Unable to create preview environment. API response: $response"
