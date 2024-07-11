@@ -60,7 +60,7 @@ runs:
         response=$(curl -X POST -d "{'env_vars': {'auto_load_pod': '${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}', 'extension_auto_install': '${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}'}, 'instance_name': '${previewName}'}" \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.staging.aws.localstack.cloud/v1/compute/instances)
+            https://api.staging.aws.localstack.cloud/v1/compute/instances/)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
           echo "Unable to create preview environment. API response: $response"
