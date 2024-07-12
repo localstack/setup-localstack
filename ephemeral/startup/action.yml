@@ -57,7 +57,7 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\"}" \
+        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"env_vars\": {\"AUTO_LOAD_POD\": \"${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}\", \"EXTENSION_AUTO_INSTALL\": \"${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}\" }}\
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
             https://api.staging.aws.localstack.cloud/v1/compute/instances)
