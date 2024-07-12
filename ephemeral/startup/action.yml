@@ -18,6 +18,7 @@ inputs:
   extension-auto-install:
     description: 'The extension(s) to automatically install onf startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
     required: false
+    default: ''
   
 
 runs:
