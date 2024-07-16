@@ -68,6 +68,14 @@ inputs:
   state-name:
     description: 'Name of the state artifact (without extension)'
     required: false
+  auto-load-pod:
+    description: 'The pod to load on startup of LocalStack, the env var AUTO_LOAD_POD'
+    required: false
+    default: ''
+  extension-auto-install:
+    description: 'The extension(s) to automatically install on startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
+    required: false
+    default: ''
 
 runs:
   using: "composite"

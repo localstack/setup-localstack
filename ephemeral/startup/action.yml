@@ -16,7 +16,7 @@ inputs:
     required: false
     default: ''
   extension-auto-install:
-    description: 'The extension(s) to automatically install onf startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
+    description: 'The extension(s) to automatically install on startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
     required: false
     default: ''
   
