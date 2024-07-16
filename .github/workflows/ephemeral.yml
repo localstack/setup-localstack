@@ -45,6 +45,7 @@ jobs:
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
+        if: ${{ always() }}
         uses: jenseng/dynamic-uses@v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
