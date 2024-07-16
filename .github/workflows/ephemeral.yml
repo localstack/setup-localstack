@@ -43,3 +43,59 @@ jobs:
         env:
           LOCALSTACK_API_KEY: ${{ secrets.STAGING_LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+  extension-test:
+    permissions: write-all
+    name: 'Test ephemeral instance workflow for extensions'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy Ephemeral Instance
+        uses: jenseng/dynamic-uses@v1
+        with:
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
+              "state-backend": "ephemeral",
+              "state-action": "start",
+              "skip-ephemeral-stop": "true",
+              "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
+              "extension-auto-install": "localstack-extension-mailhog"
+            }
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.STAGING_LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          PREVIEW_CMD: |-
+            awslocal s3 mb s3://test-bucket
+            awslocal sqs create-queue --queue-name=test-queue
+            echo "Deploy is done."
+
+      - name: Assertion step
+        run: |
+          sudo apt-get install jq jo
+          response=$(curl ${AWS_ENDPOINT_URL}/_localstack/extensions/list)
+          match=$(echo "$response" | jq -r '.[] | select(.distribution.name == "localstack-extension-mailhog") | .distribution.name')
+          if [ "$match" == "localstack-extension-mailhog" ]; then
+            echo "Match found: localstack-extension-mailhog"
+          else
+            echo "No match found"
+            exit 1
+          fi
+
+          
+      # We want explicit shutdown
+      - name: Shutdown ephemeral instance
+        uses: jenseng/dynamic-uses@v1
+        with:
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
+              "state-backend": "ephemeral",
+              "state-action": "stop"
+            }
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.STAGING_LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
