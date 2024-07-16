@@ -39,6 +39,7 @@ jobs:
             echo "Match found: localstack-extension-mailhog"
           else
             echo "No match found"
+            echo $response
             exit 1
           fi
 
