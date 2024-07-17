@@ -19,7 +19,8 @@ jobs:
               "state-backend": "ephemeral",
               "state-action": "start",
               "skip-ephemeral-stop": "true",
-              "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }}
+              "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
+              "lifetime": 5,
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
@@ -28,9 +29,25 @@ jobs:
             awslocal s3 mb s3://test-bucket
             awslocal sqs create-queue --queue-name=test-queue
             echo "Deploy is done."
+          EXTENSION_AUTO_INSTALL: "localstack-extension-mailhog"
+        
+      - name: Assertion step
+        run: |
+          sudo apt-get install jq jo
+          response=$(curl ${AWS_ENDPOINT_URL}/_localstack/extensions/list)
+          match=$(echo "$response" | jq -r '.[] | select(.distribution.name == "localstack-extension-mailhog") | .distribution.name')
+          if [ "$match" == "localstack-extension-mailhog" ]; then
+            echo "Match found: localstack-extension-mailhog"
+          else
+            echo "No match found"
+            echo $response
+            exit 1
+          fi
+
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
+        if: ${{ always() }}
         uses: jenseng/dynamic-uses@v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}

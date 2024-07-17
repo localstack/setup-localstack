@@ -15,6 +15,15 @@ inputs:
     description: 'The pod to load on startup of LocalStack, the env var AUTO_LOAD_POD'
     required: false
     default: ''
+  extension-auto-install:
+    description: 'The extension(s) to automatically install on startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
+    required: false
+    default: ''
+  lifetime:
+    description: 'The lifetime of the ephemeral instance, how long the instance should be available for'
+    required: false
+    default: '30'
+  
 
 runs:
   using: composite
@@ -53,11 +62,14 @@ runs:
         # TODO: make preview name configurable!
         previewName=preview-$prId
 
-        response=$(curl -X POST -d "{\"auto_load_pod\": \"${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}\"}" \
+        autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
+        extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
+        lifetime="${{ inputs.lifetime }}"
+
+        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
-            -H "authorization: token ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/previews/$previewName)
+            https://api.localstack.cloud/v1/compute/instances)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
           echo "Unable to create preview environment. API response: $response"
