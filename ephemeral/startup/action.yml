@@ -64,8 +64,9 @@ runs:
 
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
+        lifetime="${{ inputs.lifetime }}"
 
-        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
+        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": \"${lifetime}\" ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances)
