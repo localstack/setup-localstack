@@ -122,6 +122,7 @@ with:
 | `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
 | `auto-load-pod`    | Which pod to load on startup of LocalStack  (application preview)                | `None`   |
 | `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview) | `None`   | 
+| `lifetime`         | How long an ephemeral instance should live                                       | 30       |
 
 ## Example workflow
 ```yml
