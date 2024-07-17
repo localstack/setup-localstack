@@ -20,7 +20,7 @@ jobs:
               "state-action": "start",
               "skip-ephemeral-stop": "true",
               "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
-              "lifetime": ${{ toJSON(5) }},
+              "lifetime": ${{ toJSON(env.LIFETIME) }},
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
@@ -30,6 +30,7 @@ jobs:
             awslocal sqs create-queue --queue-name=test-queue
             echo "Deploy is done."
           EXTENSION_AUTO_INSTALL: "localstack-extension-mailhog"
+          LIFETIME: 5
         
       - name: Assertion step
         run: |
