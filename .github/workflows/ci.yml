@@ -137,10 +137,10 @@ jobs:
 
       - name: Run AWS Commands
         run: |
-          awslocal s3 rb s3://test
           awslocal s3 mb s3://test
-          awslocal sqs delete-queue --queue-url $(awslocal sqs get-queue-url --queue-name test-queue --output text)
+          awslocal s3 rb s3://test
           awslocal sqs create-queue --queue-name test-queue
+          awslocal sqs delete-queue --queue-url $(awslocal sqs get-queue-url --queue-name test-queue --output text)
 
       - name: Save the State Artifact
         uses: jenseng/dynamic-uses@v1
