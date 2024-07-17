@@ -19,6 +19,10 @@ inputs:
     description: 'The extension(s) to automatically install on startup of LocalStack, the env var EXTENSION_AUTO_INSTALL'
     required: false
     default: ''
+  lifetime:
+    description: 'The lifetime of the ephemeral instance, how long the instance should be available for'
+    required: false
+    default: '30'
   
 
 runs:
