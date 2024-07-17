@@ -133,7 +133,9 @@ runs:
           {
             "github-token": ${{ toJSON(inputs.github-token) }},
             "preview-cmd": ${{ toJSON(inputs.preview-cmd) }},
-            "auto-load-pod": ${{ toJSON(inputs.state-name) }}
+            "extension-auto-install": ${{ toJSON(inputs.extension-auto-install )}},
+            "auto-load-pod": ${{ toJSON(inputs.auto-load-pod) }},
+            "lifetime": ${{ toJSON(inputs.lifetime )}}
           }
 
     # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable

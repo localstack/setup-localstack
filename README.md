@@ -10,7 +10,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 - Installing [LocalStack AWS CLI](https://github.com/localstack/awscli-local), a thin wrapper around the `aws` command line interface for use with LocalStack to run integration tests over AWS services.
 - Export/import [LocalStack state](https://docs.localstack.cloud/user-guide/state-management/export-import-state/) as an artifact
 - Save/load [LocalStack Cloud Pods](https://docs.localstack.cloud/user-guide/state-management/cloud-pods/)
-- Start/stop a [LocalStack Ephemeral Instance](https://docs.localstack.cloud/user-guide/cloud-sandbox/application-previews/) _(EXPERIMENTAL)_
+- Start/stop a [LocalStack Ephemeral Instance](https://docs.localstack.cloud/user-guide/cloud-sandbox/ephemeral-instance/) _(PREVIEW)_
 
 ## Usage
 
@@ -76,7 +76,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 
 > **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or as a file artifact.
 
-### Manage App Preview (Ephemeral Instance)
+### Manage Application Previews (on an Ephemeral Instance)
 ```yml
 uses: LocalStack/setup-localstack@$v0.2.0
   with:
@@ -106,12 +106,15 @@ with:
 
 | Input              | Description                                                                      | Default  |
 | ------------------ | -------------------------------------------------------------------------------- | -------- |
+| `auto-load-pod`    | Which pod to load on startup of LocalStack  (application preview)                | `None`   |
 | `ci-project`          | Name of the CI project to track in LocalStack Cloud |  |
 | `configuration`    | Configuration variables to use while starting LocalStack container               | `None`   |
+| `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview) | `None`   | 
 | `github-token`          | Github token used to create PR comments |  |
 | `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
 | `include-preview`          | Whether to include the created Ephemeral Instance URL in the PR comment | `false` |
 | `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
+| `lifetime`         | How long an ephemeral instance should live                                       | 30       |
 | `preview-cmd`          | Command(s) used to create a Ephemeral Instance of the PR (can use `$AWS_ENDPOINT_URL`) |  |
 | `skip-ephemeral-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
 | `skip-startup`     | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance. | `false`  |
