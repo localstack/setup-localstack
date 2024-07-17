@@ -20,7 +20,7 @@ jobs:
               "state-action": "start",
               "skip-ephemeral-stop": "true",
               "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
-              "lifetime": 35,
+              "lifetime": 5,
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
