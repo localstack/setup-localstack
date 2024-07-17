@@ -76,7 +76,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 
 > **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or as a file artifact.
 
-### Manage App Preview (Ephemeral Instance)
+### Manage Application Previews (on an Ephemeral Instance)
 ```yml
 uses: LocalStack/setup-localstack@$v0.2.0
   with:
@@ -120,6 +120,8 @@ with:
 | `state-backend`    | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
 | `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
+| `auto-load-pod`    | Which pod to load on startup of LocalStack  (application preview)                | `None`   |
+| `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview) | `None`   | 
 
 ## Example workflow
 ```yml
