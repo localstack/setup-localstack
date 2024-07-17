@@ -57,5 +57,5 @@ jobs:
               "state-action": "stop"
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.STAGING_LOCALSTACK_API_KEY }}
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
