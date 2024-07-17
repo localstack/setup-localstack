@@ -18,7 +18,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.0
+  uses: LocalStack/setup-localstack@v0.2.2
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -31,7 +31,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Install only CLIs and startup later
 ```yml
 - name: Install LocalStack CLIs
-  uses: LocalStack/setup-localstack@v0.2.0
+  uses: LocalStack/setup-localstack@v0.2.2
   with:
     skip-startup: 'true'
     install-awslocal: 'true'
@@ -39,7 +39,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ...
 
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.0
+  uses: LocalStack/setup-localstack@v0.2.2
   with:
     image-tag: 'latest'
   env:
@@ -49,7 +49,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
-  uses: LocalStack/setup-localstack@v0.2.0
+  uses: LocalStack/setup-localstack@v0.2.2
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -63,7 +63,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Load an already saved state
 ```yml
 - name: Start LocalStack and Load State
-  uses: LocalStack/setup-localstack@v0.2.0
+  uses: LocalStack/setup-localstack@v0.2.2
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -137,7 +137,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.2.0
+        uses: LocalStack/setup-localstack@v0.2.2
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
@@ -156,7 +156,7 @@ jobs:
           echo "Test Execution complete!"
 
       - name: Save LocalStack State
-        uses: LocalStack/setup-localstack@v0.2.0
+        uses: LocalStack/setup-localstack@v0.2.2
         with:
           state-backend: local
           state-action: save
