@@ -10,7 +10,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 - Installing [LocalStack AWS CLI](https://github.com/localstack/awscli-local), a thin wrapper around the `aws` command line interface for use with LocalStack to run integration tests over AWS services.
 - Export/import [LocalStack state](https://docs.localstack.cloud/user-guide/state-management/export-import-state/) as an artifact
 - Save/load [LocalStack Cloud Pods](https://docs.localstack.cloud/user-guide/state-management/cloud-pods/)
-- Start/stop a [LocalStack Ephemeral Instance](https://docs.localstack.cloud/user-guide/cloud-sandbox/application-previews/) _(EXPERIMENTAL)_
+- Start/stop a [LocalStack Ephemeral Instance](https://docs.localstack.cloud/user-guide/cloud-sandbox/ephemeral-instance/) _(PREVIEW)_
 
 ## Usage
 
