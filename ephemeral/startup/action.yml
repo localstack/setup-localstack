@@ -59,10 +59,9 @@ runs:
       shell: bash
       run: |
         prId=$(<pr-id.txt)
-        repoName=$(echo "$GITHUB_REPOSITORY" | sed 's/^[ \t]*//;s/[ \t]*$//')
-        echo $repoName
+        repoName=$GITHUB_REPOSITORY
         repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
-        previewName=preview-$repoNameCleaned-$prId
+        previewName=preview-$repoNameCleaned$prId
         echo "previewName=$previewName" >> $GITHUB_ENV
 
     - name: Create preview environment
