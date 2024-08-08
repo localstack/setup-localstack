@@ -55,16 +55,39 @@ runs:
       with:
         name: pr
 
-    - name: Create preview environment
+    - name: Setup preview name
       shell: bash
       run: |
         prId=$(<pr-id.txt)
-        # TODO: make preview name configurable!
-        previewName=preview-$prId
+        repoName=$GITHUB_REPOSITORY
+        repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
+        previewName=preview-$repoNameCleaned-$prId
 
+    - name: Create preview environment
+      shell: bash
+      run: |
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
         lifetime="${{ inputs.lifetime }}"
+
+        list_response=$(curl -X GET \
+            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "content-type: application/json" \
+            https://api.localstack.cloud/v1/compute/instances)
+
+        echo $list_response
+
+        instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.name == $NAME)')
+
+        echo $instance_exists
+
+        if [ -n "$instance_exists" ]; then
+          del_response=$(curl -X DELETE \
+            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "content-type: application/json" \
+            https://api.localstack.cloud/v1/compute/instances/$previewName)
+            echo $del_response
+        fi
 
         response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
