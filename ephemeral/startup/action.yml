@@ -80,7 +80,7 @@ runs:
 
         echo $list_response
 
-        instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.name == $NAME)')
+        instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.instance_name == $NAME)')
 
 
         if [ -n "$instance_exists" ]; then
