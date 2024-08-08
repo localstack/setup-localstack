@@ -59,7 +59,7 @@ runs:
       shell: bash
       run: |
         prId=$(<pr-id.txt)
-        repoName=$(echo "$GITHUB_REPOSITORY" | xargs)
+        repoName=$(echo "$GITHUB_REPOSITORY" | sed 's/^[ \t]*//;s/[ \t]*$//')
         echo $repoName
         repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
         previewName=preview-$repoNameCleaned-$prId
