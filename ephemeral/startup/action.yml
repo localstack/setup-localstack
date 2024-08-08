@@ -60,8 +60,8 @@ runs:
       run: |
         prId=$(<pr-id.txt)
         repoName=$GITHUB_REPOSITORY
-        repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
-        previewName=preview-$repoNameCleaned$prId
+        repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]\n' '-')
+        previewName=preview-$repoNameCleaned-$prId
         echo "previewName=$previewName" >> $GITHUB_ENV
 
     - name: Create preview environment
