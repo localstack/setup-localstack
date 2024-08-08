@@ -70,6 +70,8 @@ runs:
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
         lifetime="${{ inputs.lifetime }}"
 
+        echo $previewName
+
         list_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
