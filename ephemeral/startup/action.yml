@@ -62,6 +62,7 @@ runs:
         repoName=$GITHUB_REPOSITORY
         repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
         previewName=preview-$repoNameCleaned-$prId
+        echo $previewName
 
     - name: Create preview environment
       shell: bash
