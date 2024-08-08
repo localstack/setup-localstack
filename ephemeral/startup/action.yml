@@ -63,6 +63,7 @@ runs:
         repoNameCleaned=$(echo "$repoName" | tr -c '[:alnum:]' '-')
         previewName=preview-$repoNameCleaned-$prId
         echo $previewName
+        echo "test"
 
     - name: Create preview environment
       shell: bash
