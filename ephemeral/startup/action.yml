@@ -78,24 +78,13 @@ runs:
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances)
 
-        echo $list_response
-
         instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.instance_name == $NAME)')
-
-
-        if [ -n "$instance_exists" ]; then
-          echo "Match found: $MATCH"
-        else
-          echo "No match found."
-        fi
-
 
         if [ -n "$instance_exists" ]; then
           del_response=$(curl -X DELETE \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances/$previewName)
-            echo $del_response
         fi
 
         response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
