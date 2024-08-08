@@ -82,7 +82,13 @@ runs:
 
         instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.name == $NAME)')
 
-        echo $instance_exists
+
+        if [ -n "$instance_exists" ]; then
+          echo "Match found: $MATCH"
+        else
+          echo "No match found."
+        fi
+
 
         if [ -n "$instance_exists" ]; then
           del_response=$(curl -X DELETE \
