@@ -22,18 +22,24 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
-    - name: Shutdown ephemeral instance
+    - name: Setup preview name
       shell: bash
       run: |
         prId=$(<pr-id.txt)
-        # TODO: make preview_name configurable
-        previewName=preview-$prId
+        repoName=$GITHUB_REPOSITORY
+        repoNameCleaned=$(echo -n "$repoName" | tr -c '[:alnum:]' '-')
+        previewName=preview-$repoNameCleaned-$prId
+        echo "previewName=$previewName" >> $GITHUB_ENV
 
+    - name: Shutdown ephemeral instance
+      shell: bash
+      run: |
         response=$(curl -X DELETE \
+            -s -o /dev/null -w "%{http_code}" \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances/$previewName)
-        if [[ "$response" != "{}" ]]; then
+        if [[ "$response" -ne 200 ]]; then
           # In case the deletion fails, e.g. if the instance cannot be found, we raise a proper error on the platform
           echo "Unable to delete preview environment. API response: $response"
           exit 1
