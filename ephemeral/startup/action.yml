@@ -23,8 +23,8 @@ inputs:
     description: 'The lifetime of the ephemeral instance, how long the instance should be available for'
     required: false
     default: '30'
-  configuration:
-    description: 'Configuration for the LocalStack environment to be created'
+  ephemeral-configuration:
+    description: 'Configuration for the ephemeral LocalStack environment to be created'
     required: false
     default: ''
 
@@ -73,8 +73,8 @@ runs:
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
         lifetime="${{ inputs.lifetime }}"
-        configuration='${{ inputs.configuration }}'
-
+        configuration="${{ inputs.ephemeral-configuration }}"
+        echo "Creating preview environment with configuration: $configuration"
         # Convert configuration to JSON format
         IFS=',' read -r -a configArray <<< "$configuration"
         envVarsJson=$(jq -n '{}')
@@ -84,9 +84,11 @@ runs:
           value=${kv[1]// /}
           envVarsJson=$(echo $envVarsJson | jq --arg key "$key" --arg value "$value" '. + {($key): $value}')
         done
+        echo "Configuration JSON: $envVarsJson"
 
         envVarsJson=$(echo $envVarsJson | jq --arg autoLoadPod "$autoLoadPod" --arg extensionAutoInstall "$extensionAutoInstall" '. + {AUTO_LOAD_POD: $autoLoadPod, EXTENSION_AUTO_INSTALL: $extensionAutoInstall}')
-
+        echo "*** Configuration ***"
+        echo $envVarsJson
         list_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
