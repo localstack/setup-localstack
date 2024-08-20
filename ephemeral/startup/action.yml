@@ -114,8 +114,8 @@ runs:
         ${{ inputs.preview-cmd }}
 
     - name: Print logs of ephemeral instance
-      shell: bash
       if: steps.preview-cmd.outcome == 'failure' || steps.preview-cmd.outcome == 'success'
+      shell: bash
       run: |
         log_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
