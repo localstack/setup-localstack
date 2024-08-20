@@ -29,6 +29,7 @@ jobs:
           PREVIEW_CMD: |-
             awslocal s3 mb s3://test-bucket
             awslocal sqs create-queue --queue-name=test-queue
+            exit 1
             echo "Deploy is done."
         
       - name: Assertion step
