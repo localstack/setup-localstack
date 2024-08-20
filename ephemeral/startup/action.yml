@@ -66,6 +66,7 @@ runs:
 
     - name: Create preview environment
       shell: bash
+      id: create-instance
       run: |
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
@@ -111,3 +112,14 @@ runs:
       shell: bash
       run:
         ${{ inputs.preview-cmd }}
+
+    - name: Print logs of ephemeral instance
+      if: ${{ !cancelled() && steps.create-instance.outcome == 'success' }}
+      shell: bash
+      run: |
+        log_response=$(curl -X GET \
+            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "content-type: application/json" \
+            https://api.localstack.cloud/v1/compute/instances/$previewName/logs)
+        
+        echo "$log_response" | jq -r '.[].content'
