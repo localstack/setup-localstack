@@ -75,7 +75,7 @@ runs:
         list_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances)
+            https://api.staging.aws.localstack.cloud/v1/compute/instances)
 
         instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.instance_name == $NAME)')
 
@@ -83,13 +83,13 @@ runs:
           del_response=$(curl -X DELETE \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances/$previewName)
+            https://api.staging.aws.localstack.cloud/v1/compute/instances/$previewName)
         fi
 
         response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances)
+            https://api.staging.aws.localstack.cloud/v1/compute/instances)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
         if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
           echo "Unable to create preview environment. API response: $response"
@@ -120,6 +120,6 @@ runs:
         log_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
             -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances/$previewName/logs)
+            https://api.staging.aws.localstack.cloud/v1/compute/instances/$previewName/logs)
         
         echo "$log_response" | jq -r '.[].content'
