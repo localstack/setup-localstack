@@ -53,7 +53,7 @@ runs:
     - name: Download PR artifact
       uses: actions/download-artifact@v4
       with:
-        name: pr
+        name: pr-id
 
     - name: Setup preview name
       shell: bash
@@ -104,7 +104,7 @@ runs:
     - name: Upload preview instance URL
       uses: actions/upload-artifact@v4
       with:
-        name: pr
+        name: preview-instance-url
         path: ./ls-preview-url.txt
 
     - name: Run preview deployment

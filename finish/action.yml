@@ -23,14 +23,14 @@ runs:
       uses: actions/download-artifact@v4
       continue-on-error: true
       with:
-        name: pr
+        name: pr-id
 
     # If the above fails, try to get the latest pr artifact from the PR related workflows
     - name: Download latest PR artifact
       uses: dawidd6/action-download-artifact@v6
       if: ${{ steps.get-pr-artifact.outcome == 'failure' }}
       with:
-        name: pr
+        name: pr-id
         pr: ${{ github.event.pull_request.number }}
         # Can be ID or workflow file name, if empty falls back to the latest successful run of the current workflow
         workflow: ${{ env.PR_ARTIFACT_WORKFLOW }}
