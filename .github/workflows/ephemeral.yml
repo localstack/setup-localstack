@@ -61,6 +61,8 @@ jobs:
             echo "Text not found in PR comments."
             exit 1
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
