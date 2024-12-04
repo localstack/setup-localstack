@@ -45,6 +45,22 @@ jobs:
             exit 1
           fi
 
+      - name: Check PR Comments for preview text
+        id: check-comments
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          TEXT_TO_FIND="Preview for this PR"
+          
+          # Fetch PR comments
+          comments=$(gh api repos/${{ github.repository }}/issues/$PR_NUMBER/comments)
+
+          # Check if the specific text is in the comments
+          if echo "$comments" | jq -e --arg text "$TEXT_TO_FIND" '.[] | select(.body | contains($text))' > /dev/null; then
+            echo "Found the text in PR comments."
+          else
+            echo "Text not found in PR comments."
+            exit 1
+          fi
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
