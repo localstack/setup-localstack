@@ -40,6 +40,23 @@ runs:
       shell: bash
       run: echo "pr_id=$(<pr-id.txt)" >> $GITHUB_OUTPUT
 
+    - name: Download preview instance URL
+      id: get-preview-instance-url-artifact
+      if: inputs.include-preview
+      uses: actions/download-artifact@v4
+      with:
+        name: preview-instance-url
+
+    # If the above fails, try to get the latest pr artifact from the PR related workflows
+    - name: Download latest PR artifact
+      uses: dawidd6/action-download-artifact@v6
+      if: ${{ steps.get-preview-instance-url-artifact.outcome == 'failure' }}
+      with:
+        name: preview-instance-url
+        pr: ${{ github.event.pull_request.number }}
+        # Can be ID or workflow file name, if empty falls back to the latest successful run of the current workflow
+        workflow: ${{ env.PR_ARTIFACT_WORKFLOW }}
+
     - name: Load the Ephemeral Instance URL
       shell: bash
       if: inputs.include-preview
