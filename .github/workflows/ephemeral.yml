@@ -18,6 +18,7 @@ jobs:
               "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
               "state-backend": "ephemeral",
               "state-action": "start",
+              "include-preview": "true",
               "skip-ephemeral-stop": "true",
               "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
               "lifetime": 5,
@@ -31,7 +32,7 @@ jobs:
             awslocal sqs create-queue --queue-name=test-queue
             echo "Deploy is done."
         
-      - name: Assertion step
+      - name: Assert mailhog is installed
         run: |
           sudo apt-get install jq jo
           response=$(curl ${AWS_ENDPOINT_URL}/_localstack/extensions/list)
@@ -44,6 +45,24 @@ jobs:
             exit 1
           fi
 
+      - name: Check PR Comments for preview text
+        id: check-comments
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          TEXT_TO_FIND="Preview for this PR"
+          
+          # Fetch PR comments
+          comments=$(gh api repos/${{ github.repository }}/issues/$PR_NUMBER/comments)
+
+          # Check if the specific text is in the comments
+          if echo "$comments" | jq -e --arg text "$TEXT_TO_FIND" '.[] | select(.body | contains($text))' > /dev/null; then
+            echo "Found the text in PR comments."
+          else
+            echo "Text not found in PR comments."
+            exit 1
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
           
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
