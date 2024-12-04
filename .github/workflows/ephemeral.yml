@@ -18,6 +18,7 @@ jobs:
               "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
               "state-backend": "ephemeral",
               "state-action": "start",
+              "include-preview": "true",
               "skip-ephemeral-stop": "true",
               "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
               "lifetime": 5,
@@ -31,7 +32,7 @@ jobs:
             awslocal sqs create-queue --queue-name=test-queue
             echo "Deploy is done."
         
-      - name: Assertion step
+      - name: Assert mailhog is installed
         run: |
           sudo apt-get install jq jo
           response=$(curl ${AWS_ENDPOINT_URL}/_localstack/extensions/list)
