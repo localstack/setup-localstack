@@ -18,6 +18,7 @@ jobs:
               "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
               "state-backend": "ephemeral",
               "state-action": "start",
+              "include-preview": "true",
               "skip-ephemeral-stop": "true",
               "preview-cmd": ${{ toJSON(env.PREVIEW_CMD) }},
               "lifetime": 5,
