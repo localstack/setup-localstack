@@ -73,7 +73,7 @@ runs:
         lifetime="${{ inputs.lifetime }}"
 
         list_response=$(curl -X GET \
-            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances)
 
@@ -81,13 +81,13 @@ runs:
 
         if [ -n "$instance_exists" ]; then
           del_response=$(curl -X DELETE \
-            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances/$previewName)
         fi
 
         response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
-            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances)
         endpointUrl=$(echo "$response" | jq -r .endpoint_url)
@@ -118,7 +118,7 @@ runs:
       shell: bash
       run: |
         log_response=$(curl -X GET \
-            -H "ls-api-key: ${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}" \
+            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
             https://api.localstack.cloud/v1/compute/instances/$previewName/logs)
         
