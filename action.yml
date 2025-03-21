@@ -97,7 +97,7 @@ runs:
       shell: bash
 
     - name: Install tools
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       if: ${{ inputs.skip-startup == 'true' || inputs.state-backend == 'ephemeral' || inputs.state-action == 'save' }}
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/tools
@@ -107,7 +107,7 @@ runs:
           }
 
     - name: Start Localstack
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       if: ${{ inputs.skip-startup != 'true' && inputs.state-backend != 'ephemeral' && inputs.state-action != 'save' }}
       with:
         # now we can dynamically determine sub-action path 🥳
@@ -126,7 +126,7 @@ runs:
 
     - name: Create Ephemeral Instance
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' }}
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/startup
         with: |-
@@ -141,7 +141,7 @@ runs:
     # Use different artifact from current workflow's by passing the workflow's id as WORKFLOW_ID env variable
     - name: Manage state
       if: ${{ inputs.state-action == 'save' || inputs.state-action == 'load' }}
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/${{ inputs.state-backend }}
         with: |-
@@ -152,7 +152,7 @@ runs:
 
     - name: Display Ephemeral Instance URL
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' && (inputs.include-preview == 'true' || inputs.ci-project != '') }}
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/finish
         with: |-
@@ -164,7 +164,7 @@ runs:
     
     - name: Stop Ephemeral Instance
       if: ${{ (inputs.skip-ephemeral-stop == 'false' || inputs.state-action == 'stop') && inputs.state-backend == 'ephemeral' }}
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/ephemeral/shutdown
         with: |-

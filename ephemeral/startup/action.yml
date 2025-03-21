@@ -42,7 +42,7 @@ runs:
 
     - name: Initial PR comment
       if: inputs.github-token
-      uses: jenseng/dynamic-uses@v1
+      uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
       with:
         uses: ${{ env.GH_ACTION_ROOT }}/prepare
         with: |-
