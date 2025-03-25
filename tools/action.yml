@@ -5,13 +5,19 @@ inputs:
     description: 'Whether to install the `awslocal` CLI into the environment'
     required: true
     default: 'true'
+  update-pip:
+    description: 'Whether to update the current pip installation'
+    required: true
+    default: 'true'
 
 runs:
   using: "composite"
   steps:
     - name: Start LocalStack
       run: |
-        pip install --upgrade pip
+        if [ "$UPDATE_PIP" = true ]; then
+          pip install --upgrade pip
+        fi
         which localstack > /dev/null || pip install localstack
         if [ "$INSTALL_AWSLOCAL" = true ]; then
           which awslocal > /dev/null || pip install awscli-local[ver1]
@@ -19,4 +25,4 @@ runs:
       shell: bash
       env:
         INSTALL_AWSLOCAL: "${{ inputs.install-awslocal }}"
-
+        UPDATE_PIP: "${{ inputs.update-pip }}"
