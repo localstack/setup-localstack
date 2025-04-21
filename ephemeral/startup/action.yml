@@ -100,6 +100,7 @@ runs:
         echo $endpointUrl > ./ls-preview-url.txt
         echo "LS_PREVIEW_URL=$endpointUrl" >> $GITHUB_ENV
         echo "AWS_ENDPOINT_URL=$endpointUrl" >> $GITHUB_ENV
+        echo "AWS_ENDPOINT_URL_S3=$endpointUrl" >> $GITHUB_ENV
 
     - name: Upload preview instance URL
       uses: actions/upload-artifact@v4
