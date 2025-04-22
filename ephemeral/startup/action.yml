@@ -73,6 +73,7 @@ runs:
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
         lifetime="${{ inputs.lifetime }}"
 
+        echo "Checking if instance exists"
         list_response=$(curl -X GET \
             -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
@@ -87,6 +88,7 @@ runs:
             https://api.localstack.cloud/v1/compute/instances/$previewName)
         fi
 
+        echo "Now trying to make an instance" 
         response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
             -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
             -H "content-type: application/json" \
