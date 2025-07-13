@@ -1,4 +1,5 @@
 name: Create PR Preview
+description: 'Creates a preview environment for a pull request.'
 
 inputs:
   github-token:
@@ -28,16 +29,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: >
-        echo "GH_ACTION_ROOT=$(
-          ls -d $(
-            ls -d ./../../_actions/* |
-            grep -i localstack |
-            tail -n1
-          )/setup-localstack/* | 
-          grep -v completed | 
-          tail -n1
-        )" >> $GITHUB_ENV
+    - run: echo "GH_ACTION_ROOT=${{ github.action_path }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Initial PR comment
