@@ -11,6 +11,10 @@ inputs:
     description: 'Tag of the LocalStack Docker image to use'
     required: true
     default: 'latest'
+  image-name:
+    description: 'Full name of the LocalStack Docker image to use (e.g., my.registry.com/localstack/localstack:latest). Overrides image-tag.'
+    required: false
+    default: ''
   install-awslocal:
     description: 'Whether to install the `awslocal` CLI into the environment'
     required: true
@@ -117,6 +121,7 @@ runs:
         with: |-
           {
             "image-tag": ${{ toJSON(inputs.image-tag) }},
+            "image-name": ${{ toJSON(inputs.image-name) }},
             "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
             "use-pro": ${{ toJSON(inputs.use-pro) }},
             "configuration": ${{ toJSON(inputs.configuration) }},
