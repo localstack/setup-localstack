@@ -42,7 +42,7 @@ runs:
     #   with:
     #     github-token: ${{ inputs.github-token }}
     #     ci-project: ${{ inputs.ci-project }}
-    - run: echo "GH_ACTION_ROOT=${{ github.action_path }}" >> $GITHUB_ENV
+    - run: echo "GH_ACTION_ROOT=${{ github.action_repository }}@${{ github.sha }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Install tools
