@@ -112,6 +112,7 @@ with:
 | `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview) | `None`   | 
 | `github-token`          | Github token used to create PR comments |  |
 | `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
+| `image-name`       | Full name of the LocalStack Docker image to use (e.g., `my.registry.com/localstack/localstack:latest`). Overrides `image-tag`. | `''`   |
 | `include-preview`          | Whether to include the created Ephemeral Instance URL in the PR comment | `false` |
 | `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
 | `lifetime`         | How long an ephemeral instance should live                                       | 30       |

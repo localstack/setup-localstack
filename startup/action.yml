@@ -1,10 +1,15 @@
 name: 'Start up Localstack'
+description: 'Starts up LocalStack container'
 
 inputs:
   image-tag:
     description: 'Tag of the LocalStack Docker image to use'
     required: true
     default: 'latest'
+  image-name:
+    description: 'Full name of the LocalStack Docker image to use (e.g., my.registry.com/localstack/localstack:latest). Overrides image-tag.'
+    required: false
+    default: ''
   install-awslocal:
     description: 'Whether to install the `awslocal` CLI into the environment'
     required: true
@@ -60,14 +65,16 @@ runs:
 
     - name: Start LocalStack
       run: |
-        if [ "$USE_PRO" = true ]; then
-          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
-            echo "WARNING: LocalStack API key not detected, please verify your configuration..."
+        if [ -z "$IMAGE_NAME" ]; then
+          if [ "$USE_PRO" = true ]; then
+            if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
+              echo "WARNING: LocalStack API key not detected, please verify your configuration..."
+            fi
+            CONFIGURATION="DNS_ADDRESS=127.0.0.1 ${CONFIGURATION}"
+            IMAGE_NAME="localstack/localstack-pro:${IMAGE_TAG}"
+          else
+            IMAGE_NAME="localstack/localstack:${IMAGE_TAG}"
           fi
-          CONFIGURATION="DNS_ADDRESS=127.0.0.1 ${CONFIGURATION}"
-          IMAGE_NAME="${IMAGE_NAME:-localstack/localstack-pro:${IMAGE_TAG}}"
-        else
-          IMAGE_NAME="${IMAGE_NAME:-localstack/localstack:${IMAGE_TAG}}"
         fi
 
         CONFIGURATION="IMAGE_NAME=${IMAGE_NAME} ${CONFIGURATION}"
@@ -82,6 +89,7 @@ runs:
       shell: bash
       env:
         IMAGE_TAG: ${{ inputs.image-tag }}
+        IMAGE_NAME: ${{ inputs.image-name }}
         INSTALL_AWSLOCAL: ${{ inputs.install-awslocal }}
         USE_PRO: ${{ inputs.use-pro }}
         CONFIGURATION: ${{ inputs.configuration }}
