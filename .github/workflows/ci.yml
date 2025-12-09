@@ -13,12 +13,12 @@ jobs:
     name: 'Test LocalStack GitHub Action'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       # We must hack the action call as remote to be able to use the relative paths
       # Could it break with different CWD? 🤔
       - name: Start LocalStack
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -42,12 +42,12 @@ jobs:
     name: 'Test LocalStack Version with Github Actions'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       # We must hack the action call as remote to be able to use the relative paths
       # Could it break with different CWD? 🤔
       - name: Start LocalStack
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -71,10 +71,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⚡️ Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Start LocalStack
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -94,7 +94,7 @@ jobs:
           awslocal sqs create-queue --queue-name test-queue
 
       - name: Save the Cloud Pod 
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -111,10 +111,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⚡️ Checkout the repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Start LocalStack
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -139,7 +139,7 @@ jobs:
           awslocal sqs delete-queue --queue-url $(awslocal sqs get-queue-url --queue-name test-queue --output text)
 
       - name: Save the State Artifact
-        uses: jenseng/dynamic-uses@v1
+        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
