@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Deploy Ephemeral Instance
-        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
+        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
@@ -67,7 +67,7 @@ jobs:
       # We want explicit shutdown
       - name: Shutdown ephemeral instance
         if: ${{ always() }}
-        uses: jenseng/dynamic-uses@26a7fa196ecfc98e02d08d65a09d03ab999683ae # v1
+        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
         with:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
