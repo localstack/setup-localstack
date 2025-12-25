@@ -1,4 +1,5 @@
 name: Create PR Preview
+description: 'Creates a preview environment for a pull request.'
 
 inputs:
   github-token:
