@@ -30,7 +30,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run Tests Against LocalStack
         run: |
@@ -59,7 +59,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run Version Test Against LocalStack
         run: |
@@ -86,7 +86,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run AWS commands
         run: |
@@ -104,7 +104,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
   local-state-test:
     name: 'Test Local State Action'
@@ -129,7 +129,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run AWS Commands
         run: |
@@ -150,4 +150,4 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
