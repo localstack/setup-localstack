@@ -104,25 +104,26 @@ with:
 
 ## Inputs
 
-| Input              | Description                                                                      | Default  |
-| ------------------ | -------------------------------------------------------------------------------- | -------- |
-| `auto-load-pod`    | Which pod to load on startup of LocalStack  (application preview)                | `None`   |
-| `ci-project`          | Name of the CI project to track in LocalStack Cloud |  |
-| `configuration`    | Configuration variables to use while starting LocalStack container               | `None`   |
-| `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview) | `None`   | 
-| `github-token`          | Github token used to create PR comments |  |
-| `image-tag`        | Tag of the LocalStack Docker image to use                                        | `latest` |
-| `include-preview`          | Whether to include the created Ephemeral Instance URL in the PR comment | `false` |
-| `install-awslocal` | Whether to install the `awslocal` CLI into the build environment                 | `true`   |
-| `lifetime`         | How long an ephemeral instance should live                                       | 30       |
-| `preview-cmd`          | Command(s) used to create a Ephemeral Instance of the PR (can use `$AWS_ENDPOINT_URL`) |  |
-| `skip-ephemeral-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
-| `skip-startup`     | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance. | `false`  |
-| `skip-wait`        | Skip waiting for LocalStack to start up | `false`  |
-| `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `` |
-| `state-backend`    | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
-| `state-name`       | Name of the state artifact (without extension) | `false`  |
-| `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
+| Input                    | Description                                                                                                                                                                                                             | Default      |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------|
+| `auto-load-pod`          | Which pod to load on startup of LocalStack  (application preview)                                                                                                                                                       | `None`       |
+| `ci-project`             | Name of the CI project to track in LocalStack Cloud                                                                                                                                                                     |              |
+| `configuration`          | Configuration variables to use while starting LocalStack container                                                                                                                                                      | `None`       |
+| `extension-auto-install` | Which extensions to install on startup of LocalStack (application preview)                                                                                                                                              | `None`       | 
+| `github-token`           | Github token used to create PR comments                                                                                                                                                                                 |              |
+| `image-tag`              | Tag of the LocalStack Docker image to use                                                                                                                                                                               | `latest`     |
+| `include-preview`        | Whether to include the created Ephemeral Instance URL in the PR comment                                                                                                                                                 | `false`      |
+| `install-awslocal`       | Whether to install the `awslocal` CLI into the build environment                                                                                                                                                        | `true`       |
+| `lifetime`               | How long an ephemeral instance should live                                                                                                                                                                              | 30           |
+| `preview-cmd`            | Command(s) used to create a Ephemeral Instance of the PR (can use `$AWS_ENDPOINT_URL`)                                                                                                                                  |              |
+| `skip-ephemeral-stop`    | Skip stopping LocalStack Ephemeral Instance                                                                                                                                                                             | `false`      |
+| `skip-startup`           | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance.                                                                   | `false`      |
+| `skip-wait`              | Skip waiting for LocalStack to start up                                                                                                                                                                                 | `false`      |
+| `state-action`           | Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state). Values `start`/`stop` only usable with app previews.                                                                                  | ``           |
+| `state-backend`          | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods` |
+| `state-name`             | Name of the state artifact (without extension)                                                                                                                                                                          | `false`      |
+| `update-pip`             | Whether to update the current pip version when installing tools                                                                                                                                                         | `true`       |
+| `use-pro`                | Whether to use the Pro version of LocalStack (requires API key to be configured)                                                                                                                                        | `false`      |
 
 ## Example workflow
 ```yml

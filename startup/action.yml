@@ -25,6 +25,10 @@ inputs:
     description: 'Skip wait for LocalStack'
     required: false
     default: 'false'
+  update-pip:
+    description: 'Whether to update the current pip installation'
+    required: true
+    default: 'true'
 
 runs:
   using: "composite"
@@ -56,6 +60,7 @@ runs:
         with: |-
           {
             "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
+            "update-pip": ${{ toJSON(inputs.update-pip) }},
           }
 
     - name: Start LocalStack
@@ -86,4 +91,5 @@ runs:
         USE_PRO: ${{ inputs.use-pro }}
         CONFIGURATION: ${{ inputs.configuration }}
         SKIP_WAIT: ${{ inputs.skip-wait }}
+        UPDATE_PIP: ${{ inputs.update-pip }}
 

@@ -80,6 +80,10 @@ inputs:
     description: 'The lifetime of the ephemeral instance, how long the instance should be available for'
     required: false
     default: '30'
+  update-pip:
+    description: 'Whether to update the current pip installation'
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -104,6 +108,7 @@ runs:
         with: |-
           {
             "install-awslocal": ${{ toJSON(inputs.install-awslocal) }},
+            "update-pip": ${{ toJSON(inputs.update-pip) }},
           }
 
     - name: Start Localstack
@@ -121,7 +126,8 @@ runs:
             "use-pro": ${{ toJSON(inputs.use-pro) }},
             "configuration": ${{ toJSON(inputs.configuration) }},
             "ci-project": ${{ toJSON(inputs.ci-project) }},
-            "skip-wait": ${{ toJSON(inputs.skip-wait) }}
+            "skip-wait": ${{ toJSON(inputs.skip-wait) }},
+            "update-pip": ${{ toJSON(inputs.update-pip) }},
           }
 
     - name: Create Ephemeral Instance
