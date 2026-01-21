@@ -1,4 +1,5 @@
 name: 'Start up Localstack'
+description: 'Starts up Localstack'
 
 inputs:
   image-tag:
@@ -10,7 +11,7 @@ inputs:
     required: true
     default: 'true'
   use-pro:
-    description: 'Whether to use LocalStack Pro (requires a valid API key)'
+    description: 'Whether to use LocalStack Pro (requires a valid CI Auth Token)'
     required: false
     default: 'false'
   configuration:
@@ -62,7 +63,7 @@ runs:
       run: |
         if [ "$USE_PRO" = true ]; then
           if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
-            echo "WARNING: LocalStack API key not detected, please verify your configuration..."
+            echo "WARNING: LocalStack Auth Token not detected, please verify your configuration..."
           fi
           CONFIGURATION="DNS_ADDRESS=127.0.0.1 ${CONFIGURATION}"
           IMAGE_NAME="${IMAGE_NAME:-localstack/localstack-pro:${IMAGE_TAG}}"

@@ -29,7 +29,8 @@ jobs:
               "use-pro": "true",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          # intentially left `LOCALSTACK_API_KEY` as env here, to ensure the fallback still works for old version
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }} 
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run Version Test Against LocalStack

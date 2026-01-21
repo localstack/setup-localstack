@@ -1,4 +1,5 @@
 name: 'Save/Load LocalStack state'
+description: 'Save or load LocalStack state'
 
 inputs:
   name:

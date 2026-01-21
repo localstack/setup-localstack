@@ -1,4 +1,5 @@
 name: 'Install Localstack tools'
+description: 'Installs `localstack` and optionally `awslocal` CLI'
 
 inputs:
   install-awslocal:
