@@ -9,35 +9,6 @@ on:
     - cron: '48 23 * * 0'
 
 jobs:
-  localstack-action-test:
-    name: 'Test LocalStack GitHub Action'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-
-      # We must hack the action call as remote to be able to use the relative paths
-      # Could it break with different CWD? 🤔
-      - name: Start LocalStack
-        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
-        with:
-          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
-          with: |-
-            {
-              "image-tag": "latest",
-              "install-awslocal": "true",
-              "configuration": "DEBUG=1",
-              "use-pro": "true",
-            }
-        env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
-
-      - name: Run Tests Against LocalStack
-        run: |
-          awslocal s3 mb s3://test
-          awslocal s3 ls
-          echo "Test Execution complete!"
-
   localstack-action-version-test:
     name: 'Test LocalStack Version with Github Actions'
     runs-on: ubuntu-latest
@@ -66,9 +37,11 @@ jobs:
           LS_VERSION=$(docker ps | grep localstack | cut -d " " -f4 | cut -d ":" -f2)
           exit $(test "x${LS_VERSION}" = "x3.2.0")
 
-  cloud-pods-test:
+  cloud-pods-save-test:
     name: 'Test Cloud Pods Action'
     runs-on: ubuntu-latest
+    outputs:
+      pod-name: ${{ steps.pod_name.outputs.name }}
     steps:
       - name: ⚡️ Checkout the repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -85,8 +58,12 @@ jobs:
               "use-pro": "true",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
+
+      - name: Generate random pod name
+        id: pod_name
+        run: echo "name=cloud-pods-test-$RANDOM" >> $GITHUB_OUTPUT
 
       - name: Run AWS commands
         run: |
@@ -99,15 +76,72 @@ jobs:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
-              "state-name": "cloud-pods-test",
+              "state-name": "${{ steps.pod_name.outputs.name }}",
               "state-action": "save",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
-  local-state-test:
-    name: 'Test Local State Action'
+      - name: Verify Cloud Pod
+        run: |
+          localstack pod list | grep ${{ steps.pod_name.outputs.name }}
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+      
+
+  load-cloud-pod-test:
+    name: 'Test Loading Cloud Pod'
+    runs-on: ubuntu-latest
+    needs: cloud-pods-save-test
+    steps:
+      - name: ⚡️ Checkout the repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Start LocalStack and Load Pod
+        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
+        with:
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "image-tag": "latest",
+              "install-awslocal": "true",
+              "configuration": "DEBUG=1",
+              "use-pro": "true",
+              "state-name": "${{ needs.cloud-pods-save-test.outputs.pod-name }}",
+              "state-action": "load"
+            }
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
+
+      - name: Verify loaded resources
+        run: |
+          echo "Verifying S3 bucket..."
+          awslocal s3 ls | grep "test"
+          echo "Verifying SQS queue..."
+          awslocal sqs list-queues | grep "test-queue"
+
+      - name: Clean up remote pod
+        run: localstack pod delete ${{ needs.cloud-pods-save-test.outputs.pod-name }}
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+
+
+      - name: Verify successful cleanup of Cloud Pod
+        run: |
+          echo "Verifying that the pod has been deleted..."
+          if localstack pod list | grep -q ${{ needs.cloud-pods-save-test.outputs.pod-name }}; then
+            echo "Cleanup failed! Pod ${{ needs.cloud-pods-save-test.outputs.pod-name }} was not deleted."
+            exit 1
+          fi
+          echo "Pod successfully deleted."
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+      
+
+  local-state-save-test:
+    name: 'Test Local State Save Action'
     runs-on: ubuntu-latest
     steps:
       - name: ⚡️ Checkout the repository
@@ -123,20 +157,15 @@ jobs:
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
               "use-pro": "true",
-              "state-name": "cloud-pods-test",
-              "state-action": "load",
-              "state-backend": "local",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
-
-      - name: Run AWS Commands
+      
+      - name: Run AWS commands
         run: |
-          awslocal s3 mb s3://test
-          awslocal s3 rb s3://test
-          awslocal sqs create-queue --queue-name test-queue
-          awslocal sqs delete-queue --queue-url $(awslocal sqs get-queue-url --queue-name test-queue --output text)
+          awslocal s3 mb s3://test-local
+          awslocal sqs create-queue --queue-name test-queue-local
 
       - name: Save the State Artifact
         uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
@@ -144,10 +173,43 @@ jobs:
           uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
           with: |-
             {
-              "state-name": "cloud-pods-test",
+              "state-name": "local-pods-test",
               "state-action": "save",
               "state-backend": "local",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
+
+  local-state-load-test:
+    name: 'Test Local State Load Action'
+    needs: local-state-save-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⚡️ Checkout the repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Start LocalStack
+        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
+        with:
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "image-tag": "latest",
+              "install-awslocal": "true",
+              "configuration": "DEBUG=1",
+              "use-pro": "true",
+              "state-name": "local-pods-test",
+              "state-action": "load",
+              "state-backend": "local",
+            }
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Run AWS Commands
+        run: |
+          echo "Verifying S3 bucket..."
+          awslocal s3 ls | grep "test-local"
+          echo "Verifying SQS queue..."
+          awslocal sqs list-queues | grep "test-queue-local"
