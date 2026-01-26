@@ -1,9 +1,5 @@
 name: LocalStack Ephemeral Instance Test
 on:  
-  pull_request:
-    paths-ignore:
-      - ./*.md
-      - LICENSE
   workflow_dispatch:
 
 jobs:
