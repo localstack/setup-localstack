@@ -86,10 +86,10 @@ runs:
                     return 0
                 fi
                 count=$((count + 1))
-                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)"
+                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)" > /dev/tty
                 sleep $wait
             done
-            echo "Command failed after $retries retries."
+            echo "Command failed after $retries retries." > /dev/tty
             return 1
         }
 
@@ -188,10 +188,10 @@ runs:
                     return 0
                 fi
                 count=$((count + 1))
-                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)"
+                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)" > /dev/tty
                 sleep $wait
             done
-            echo "Command failed after $retries retries."
+            echo "Command failed after $retries retries." > /dev/tty
             return 1
         }
 
@@ -223,5 +223,9 @@ runs:
         }
         echo "Fetching logs for $previewName ..."
         log_response=$(retry fetch_logs)
+        if [ -z "$log_response" ]; then
+          echo "Error: Failed to fetch logs after multiple retries."
+          exit 1
+        fi
         echo "Logs:"
         echo "$log_response" | jq -r '.[].content'
