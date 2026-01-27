@@ -114,7 +114,7 @@ runs:
 
         delete_instance() {
             # We expect a 200 on success or 404 if it's already gone. Other codes are errors.
-            http_code=$(curl -o /dev/null -w "%{http_code}" -X DELETE \
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
@@ -125,11 +125,12 @@ runs:
         }
 
         if [ -n "$instance_exists" ]; then
+          echo "Found existing instance using '$previewName', trying to delete the old one..."
           retry delete_instance
         fi
 
         create_instance_func() {
-            response=$(curl --fail-with-body -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
+            response=$(curl --fail-with-body -s -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
@@ -141,6 +142,7 @@ runs:
             fi
         }
 
+        echo "Creating preview environment ..."
         retry create_instance_func
 
         echo "Created preview environment with endpoint URL: $endpointUrl"
@@ -196,6 +198,6 @@ runs:
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName/logs")
         }
-
+        echo "Fetching logs for $previewName ..."
         retry fetch_logs
-        echo "$log_response" | jq -r '.[].content'
+        echo "Logs:\n$log_response" | jq -r '.[].content'
