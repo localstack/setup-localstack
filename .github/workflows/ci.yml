@@ -29,7 +29,8 @@ jobs:
               "use-pro": "true",
             }
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          # intentially left `LOCALSTACK_API_KEY` as env here, to ensure the fallback still works for old version
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_AUTH_TOKEN }} 
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Run Version Test Against LocalStack
@@ -58,7 +59,7 @@ jobs:
               "use-pro": "true",
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Generate random pod name
@@ -80,14 +81,14 @@ jobs:
               "state-action": "save",
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Verify Cloud Pod
         run: |
           localstack pod list | grep ${{ steps.pod_name.outputs.name }}
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
       
 
   load-cloud-pod-test:
@@ -112,7 +113,7 @@ jobs:
               "state-action": "load"
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
       - name: Verify loaded resources
@@ -125,7 +126,7 @@ jobs:
       - name: Clean up remote pod
         run: localstack pod delete ${{ needs.cloud-pods-save-test.outputs.pod-name }}
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
 
       - name: Verify successful cleanup of Cloud Pod
@@ -137,7 +138,7 @@ jobs:
           fi
           echo "Pod successfully deleted."
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
       
 
   local-state-save-test:
@@ -159,7 +160,7 @@ jobs:
               "use-pro": "true",
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
       
       - name: Run AWS commands
@@ -178,7 +179,7 @@ jobs:
               "state-backend": "local",
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
 
   local-state-load-test:
@@ -204,7 +205,7 @@ jobs:
               "state-backend": "local",
             }
         env:
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.ref_name }}
 
       - name: Run AWS Commands

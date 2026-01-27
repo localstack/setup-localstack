@@ -1,4 +1,5 @@
 name: Finish CI Build
+description: Finish CI Build
 
 inputs:
   github-token:

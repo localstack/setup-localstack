@@ -6,7 +6,7 @@
 A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) on your GitHub Actions runner workflow by:
 
 - Pulling a specific version of the LocalStack Docker Image into the GitHub Action runner.
-- Configuring the [LocalStack CLI](https://docs.localstack.cloud/get-started/#localstack-cli) to launch the Docker container with an optional API token for pro usage.
+- Configuring the [LocalStack CLI](https://docs.localstack.cloud/get-started/#localstack-cli) to launch the Docker container with an optional Auth Token for pro usage.
 - Installing [LocalStack AWS CLI](https://github.com/localstack/awscli-local), a thin wrapper around the `aws` command line interface for use with LocalStack to run integration tests over AWS services.
 - Export/import [LocalStack state](https://docs.localstack.cloud/user-guide/state-management/export-import-state/) as an artifact
 - Save/load [LocalStack Cloud Pods](https://docs.localstack.cloud/user-guide/state-management/cloud-pods/)
@@ -23,9 +23,9 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
     image-tag: 'latest'
     install-awslocal: 'true'
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set if `use-pro` is set to `true`.  
+> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required to be set if `use-pro` is set to `true`.  
 If the key is not found LocalStack by default falls back to the CE edition and displays a warning.
 
 ### Install only CLIs and startup later
@@ -43,7 +43,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
   with:
     image-tag: 'latest'
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
 
 ### Save a state later on in the pipeline
@@ -56,9 +56,9 @@ If the key is not found LocalStack by default falls back to the CE edition and d
     state-action: save
     state-name: my-cloud-pod
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to save/load LocalStack's state either as a Cloud Pod or as a file artifact.
+> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required to be set to save/load LocalStack's state either as a Cloud Pod or as a file artifact.
 
 ### Load an already saved state
 ```yml
@@ -70,11 +70,11 @@ If the key is not found LocalStack by default falls back to the CE edition and d
     state-action: load
     state-name: my-cloud-pod
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
 > **NOTE**: To load a **local state** from a different GitHub Actions workflow, one must set the `WORKFLOW_ID` environment variable.
 
-> **NOTE**: The `LOCALSTACK_API_KEY` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or as a file artifact.
+> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required to be set to **save/load** LocalStack's state either as a Cloud Pod or as a file artifact.
 
 ### Manage Application Previews (on an Ephemeral Instance)
 ```yml
@@ -88,7 +88,7 @@ uses: LocalStack/setup-localstack@v0.2.3
       # Optional script/command to run
       preview-cmd: deploy.sh
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
 ...
 
@@ -99,7 +99,7 @@ with:
       state-backend: ephemeral
       state-action: stop
   env:
-    LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
 
 ## Inputs
@@ -119,10 +119,10 @@ with:
 | `skip-ephemeral-stop`        | Skip stopping LocalStack Ephemeral Instance | `false`  |
 | `skip-startup`     | Explicitly prevent LocalStack start up, only installs CLI(s). Recommended to manage state later on in the pipeline or start up an ephemeral instance. | `false`  |
 | `skip-wait`        | Skip waiting for LocalStack to start up | `false`  |
-| `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `` |
+| `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `''` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `''` |
 | `state-backend`    | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
-| `use-pro`          | Whether to use the Pro version of LocalStack (requires API key to be configured) | `false`  |
+| `use-pro`          | Whether to use the Pro version of LocalStack (requires Auth Token to be configured) | `false`  |
 
 ## Example workflow
 ```yml
@@ -147,7 +147,7 @@ jobs:
           state-action: load
           state-name: my-cloud-pod
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 
       - name: Run Tests against LocalStack
         run: |
@@ -162,7 +162,7 @@ jobs:
           state-action: save
           state-name: my-ls-state-artifact
         env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
           WORKFLOW_ID: ${{ env.MY_GOLDEN_LS_STATE }}
 ```
 

@@ -16,7 +16,7 @@ inputs:
     required: true
     default: 'true'
   use-pro:
-    description: 'Whether to use LocalStack Pro (requires a valid API key)'
+    description: 'Whether to use LocalStack Pro (requires a valid CI Auth Token)'
     required: false
     default: 'false'
   configuration:

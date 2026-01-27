@@ -1,4 +1,5 @@
 name: 'Save/Load a LocalStack Cloud Pod'
+description: 'Save or load a LocalStack Cloud Pod'
 
 inputs:
   name:

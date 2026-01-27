@@ -1,4 +1,5 @@
 name: Start CI Build
+description: Start CI Build
 
 inputs:
   github-token:
