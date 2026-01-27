@@ -29,18 +29,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: >
-        echo "GH_ACTION_ROOT=$(
-          ls -d $(
-            ls -d ./../../_actions/* |
-            grep -i localstack |
-            tail -n1
-          )/setup-localstack/* | 
-          grep -v completed | 
-          tail -n1
-        )" >> $GITHUB_ENV
-      shell: bash
-
     - name: Initial PR comment
       if: inputs.github-token
       uses: jenseng/dynamic-uses@5175289a9a87978dcfcb9cf512b821d23b2a53eb # v1
@@ -68,11 +56,6 @@ runs:
         echo "name=$previewName" >> $GITHUB_OUTPUT
 
     - name: Create preview environment
-      # Source shared retry function
-      # GH_ACTION_ROOT is set in the main action.yml and points to the root of the action
-      # This ensures the script is found regardless of where the action is run from.
-      env:
-        SHARED_SCRIPTS_PATH: ${{ env.GH_ACTION_ROOT }}/.github/actions/shared-scripts
       shell: bash
       id: create-instance
       run: |
@@ -80,7 +63,7 @@ runs:
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
-        source "$SHARED_SCRIPTS_PATH/retry-function.sh"
+        source ${{ github.action_path }}/retry-function.sh
         fetch_instances() {
             local list_response
             list_response=$(curl --fail-with-body -s -X GET \
@@ -159,15 +142,12 @@ runs:
       shell: bash
       env:
         previewName: ${{ steps.preview-name.outputs.name }}
-        # Source shared retry function
-        # GH_ACTION_ROOT is set in the main action.yml and points to the root of the action
-        SHARED_SCRIPTS_PATH: ${{ env.GH_ACTION_ROOT }}/.github/actions/shared-scripts
       run: |
         AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
-        source "$SHARED_SCRIPTS_PATH/retry-function.sh"
+        source ${{ github.action_path }}/retry-function.sh
         fetch_logs() {
             local log_response
             log_response=$(curl --fail-with-body -s -X GET \
