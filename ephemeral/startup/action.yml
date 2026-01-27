@@ -80,7 +80,7 @@ runs:
             local count=0
             local wait=5
             while [ $count -lt $retries ]; do
-                "$@"
+                ( set +e; "$@"; ) # Run command in subshell with set -e disabled
                 local exit_code=$?
                 if [ $exit_code -eq 0 ]; then
                     return 0
@@ -94,7 +94,7 @@ runs:
         }
 
         fetch_instances() {
-            list_response=$(curl --fail-with-body -X GET \
+            list_response=$(curl --fail-with-body -s -X GET \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
