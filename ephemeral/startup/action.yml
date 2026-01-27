@@ -58,12 +58,14 @@ runs:
 
     - name: Setup preview name
       shell: bash
+      id: preview-name
       run: |
         prId=$(<pr-id.txt)
         repoName=$GITHUB_REPOSITORY
         repoNameCleaned=$(echo -n "$repoName" | tr -c '[:alnum:]' '-')
         previewName=preview-$repoNameCleaned-$prId
         echo "previewName=$previewName" >> $GITHUB_ENV
+        echo "name=$previewName" >> $GITHUB_OUTPUT
 
     - name: Create preview environment
       shell: bash
@@ -92,7 +94,7 @@ runs:
         }
 
         fetch_instances() {
-            list_response=$(curl --fail-with-body -s -X GET \
+            list_response=$(curl --fail-with-body -X GET \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
@@ -112,7 +114,7 @@ runs:
 
         delete_instance() {
             # We expect a 200 on success or 404 if it's already gone. Other codes are errors.
-            http_code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+            http_code=$(curl -o /dev/null -w "%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
@@ -127,7 +129,7 @@ runs:
         fi
 
         create_instance_func() {
-            response=$(curl --fail-with-body -s -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
+            response=$(curl --fail-with-body -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
@@ -156,12 +158,14 @@ runs:
     - name: Run preview deployment
       if: ${{ inputs.preview-cmd != '' }}
       shell: bash
-      run:
+      run: |
         ${{ inputs.preview-cmd }}
 
     - name: Print logs of ephemeral instance
       if: ${{ !cancelled() && steps.create-instance.outcome == 'success' }}
       shell: bash
+      env:
+        previewName: ${{ steps.preview-name.outputs.name }}
       run: |
         AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
