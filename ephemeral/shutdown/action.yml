@@ -58,13 +58,19 @@ runs:
         }
 
         shutdown_instance() {
-            http_code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+            # The API returns a 200 on successful deletion.
+            # We use --fail-with-body so curl fails on server errors (5xx) and triggers the retry.
+            # We allow a 404 since that means the instance is already gone.
+            http_code=$(curl --fail-with-body -s -o /dev/null -w "%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
-            if [[ "$http_code" -ne 200 && "$http_code" -ne 404 ]]; then
-                echo "Unable to delete preview environment. API returned HTTP code: $http_code"
-                return 1
+            if [ $? -eq 0 ]; then
+              if [ "$http_code" -eq 200 ]; then
+                  echo "Instance '$previewName' deleted successfully."
+              elif [ "$http_code" -eq 404 ]; then
+                  echo "Instance '$previewName' was already deleted (not found)."
+              fi
             fi
         }
         retry shutdown_instance

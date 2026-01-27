@@ -94,17 +94,19 @@ runs:
         }
 
         fetch_instances() {
+            local list_response
             list_response=$(curl --fail-with-body -s -X GET \
-                -H "$AUTH_HEADER" \
-                -H "$CONTENT_TYPE_HEADER" \
-                "$API_URL_BASE")
-            if ! echo "$list_response" | jq -e 'type == "array"' > /dev/null; then
-                echo "API returned an error: $list_response"
-                return 1
+              -H "$AUTH_HEADER" \
+              -H "$CONTENT_TYPE_HEADER" \
+              "$API_URL_BASE")
+            if [ $? -ne 0 ]; then
+              echo "API returned an error: $list_response"
+              return 1
             fi
+            echo "$list_response"
         }
 
-        retry fetch_instances
+        list_response=$(retry fetch_instances)
 
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
@@ -130,20 +132,21 @@ runs:
         fi
 
         create_instance_func() {
+            local response
             response=$(curl --fail-with-body -s -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
-            
-            endpointUrl=$(echo "$response" | jq -r .endpoint_url)
-            if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
+            if [ $? -ne 0 ] || ! echo "$response" | jq -e 'has("endpoint_url") and (.endpoint_url | test(".+"))' > /dev/null; then
               echo "Unable to create preview environment. API response: $response"
               return 1
             fi
+            echo "$response"
         }
 
         echo "Creating preview environment ..."
-        retry create_instance_func
+        response=$(retry create_instance_func)
+        endpointUrl=$(echo "$response" | jq -r .endpoint_url)
 
         echo "Created preview environment with endpoint URL: $endpointUrl"
 
@@ -193,11 +196,22 @@ runs:
         }
 
         fetch_logs() {
+            local log_response
             log_response=$(curl --fail-with-body -s -X GET \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName/logs")
+            if [ $? -ne 0 ]; then
+              echo "API returned an error while fetching logs: $log_response"
+              return 1
+            fi
+            if [ -z "$log_response" ]; then
+              echo "API returned an empty response when fetching logs."
+              return 1
+            fi
+            echo "$log_response"
         }
         echo "Fetching logs for $previewName ..."
-        retry fetch_logs
-        echo "Logs:\n$log_response" | jq -r '.[].content'
+        log_response=$(retry fetch_logs)
+        echo "Logs:"
+        echo "$log_response" | jq -r '.[].content'
