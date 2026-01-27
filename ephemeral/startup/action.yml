@@ -96,7 +96,7 @@ runs:
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
-            if echo "$list_response" | jq -e '.error == true' > /dev/null; then
+            if ! echo "$list_response" | jq -e 'type == "array"' > /dev/null; then
                 echo "API returned an error: $list_response"
                 return 1
             fi
@@ -137,7 +137,7 @@ runs:
               echo "Unable to create preview environment. API response: $response"
               return 1
             fi
-        fi
+        }
 
         retry create_instance_func
 

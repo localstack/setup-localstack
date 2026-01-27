@@ -66,7 +66,7 @@ runs:
                 echo "Unable to delete preview environment. API returned HTTP code: $http_code"
                 return 1
             fi
-        fi
+        }
         retry shutdown_instance
     
     - name: Update status comment
