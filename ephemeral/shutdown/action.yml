@@ -1,9 +1,10 @@
 name: Shutdown Ephemeral Instance
+description: 'Shutdowns an Ephemeral Instance (PR Preview)'
 
 inputs:
-  localstack-api-key:
-    description: 'LocalStack API key used to access the platform api'
-    required: true
+  localstack-auth-token:
+    description: 'LocalStack Auth Token used to access the platform api'
+    required: false
   github-token:
     description: 'Github token used to create PR comments'
     required: true
@@ -34,16 +35,39 @@ runs:
     - name: Shutdown ephemeral instance
       shell: bash
       run: |
-        response=$(curl -X DELETE \
-            -s -o /dev/null -w "%{http_code}" \
-            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
-            -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances/$previewName)
-        if [[ "$response" -ne 200 ]]; then
-          # In case the deletion fails, e.g. if the instance cannot be found, we raise a proper error on the platform
-          echo "Unable to delete preview environment. API response: $response"
-          exit 1
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        CONTENT_TYPE_HEADER="content-type: application/json"
+        API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
+
+        retry() {
+            local retries=5
+            local count=0
+            local wait=5
+            while [ $count -lt $retries ]; do
+                "$@"
+                local exit_code=$?
+                if [ $exit_code -eq 0 ]; then
+                    return 0
+                fi
+                count=$((count + 1))
+                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)"
+                sleep $wait
+            done
+            echo "Command failed after $retries retries."
+            return 1
+        }
+
+        shutdown_instance() {
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+                -H "$AUTH_HEADER" \
+                -H "$CONTENT_TYPE_HEADER" \
+                "$API_URL_BASE/$previewName")
+            if [[ "$http_code" -ne 200 && "$http_code" -ne 404 ]]; then
+                echo "Unable to delete preview environment. API returned HTTP code: $http_code"
+                return 1
+            fi
         fi
+        retry shutdown_instance
     
     - name: Update status comment
       uses: actions-cool/maintain-one-comment@v3.1.1

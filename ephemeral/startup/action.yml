@@ -1,11 +1,12 @@
 name: Create PR Preview
+description: 'Spins up an Ephemeral Instance for a PR Preview'
 
 inputs:
   github-token:
     description: 'Github token used to create PR comments'
     required: true
-  localstack-api-key:
-    description: 'LocalStack API key used to create the preview environment'
+  localstack-auth-token:
+    description: 'LocalStack Auth Token used to create the preview environment'
     required: false
   preview-cmd:
     description: 'Command(s) used to create a preview of the PR (can use $AWS_ENDPOINT_URL)'
@@ -68,33 +69,78 @@ runs:
       shell: bash
       id: create-instance
       run: |
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        CONTENT_TYPE_HEADER="content-type: application/json"
+        API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
+
+        retry() {
+            local retries=5
+            local count=0
+            local wait=5
+            while [ $count -lt $retries ]; do
+                "$@"
+                local exit_code=$?
+                if [ $exit_code -eq 0 ]; then
+                    return 0
+                fi
+                count=$((count + 1))
+                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)"
+                sleep $wait
+            done
+            echo "Command failed after $retries retries."
+            return 1
+        }
+
+        fetch_instances() {
+            list_response=$(curl --fail-with-body -s -X GET \
+                -H "$AUTH_HEADER" \
+                -H "$CONTENT_TYPE_HEADER" \
+                "$API_URL_BASE")
+            if echo "$list_response" | jq -e '.error == true' > /dev/null; then
+                echo "API returned an error: $list_response"
+                return 1
+            fi
+        }
+
+        retry fetch_instances
+
         autoLoadPod="${AUTO_LOAD_POD:-${{ inputs.auto-load-pod }}}"
         extensionAutoInstall="${EXTENSION_AUTO_INSTALL:-${{ inputs.extension-auto-install }}}"
         lifetime="${{ inputs.lifetime }}"
 
-        list_response=$(curl -X GET \
-            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
-            -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances)
-
         instance_exists=$(echo "$list_response" | jq --arg NAME "$previewName" '.[] | select(.instance_name == $NAME)')
 
+        delete_instance() {
+            # We expect a 200 on success or 404 if it's already gone. Other codes are errors.
+            http_code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+                -H "$AUTH_HEADER" \
+                -H "$CONTENT_TYPE_HEADER" \
+                "$API_URL_BASE/$previewName")
+            if [ "$http_code" -ne 200 ] && [ "$http_code" -ne 404 ]; then
+                echo "Error deleting instance, HTTP code: $http_code"
+                return 1
+            fi
+        }
+
         if [ -n "$instance_exists" ]; then
-          del_response=$(curl -X DELETE \
-            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
-            -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances/$previewName)
+          retry delete_instance
         fi
 
-        response=$(curl -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
-            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
-            -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances)
-        endpointUrl=$(echo "$response" | jq -r .endpoint_url)
-        if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
-          echo "Unable to create preview environment. API response: $response"
-          exit 1
+        create_instance_func() {
+            response=$(curl --fail-with-body -s -X POST -d "{\"instance_name\": \"${previewName}\", \"lifetime\": ${lifetime} ,\"env_vars\": {\"AUTO_LOAD_POD\": \"${autoLoadPod}\", \"EXTENSION_AUTO_INSTALL\": \"${extensionAutoInstall}\"}}"\
+                -H "$AUTH_HEADER" \
+                -H "$CONTENT_TYPE_HEADER" \
+                "$API_URL_BASE")
+            
+            endpointUrl=$(echo "$response" | jq -r .endpoint_url)
+            if [ "$endpointUrl" = "null" ] || [ "$endpointUrl" = "" ]; then
+              echo "Unable to create preview environment. API response: $response"
+              return 1
+            fi
         fi
+
+        retry create_instance_func
+
         echo "Created preview environment with endpoint URL: $endpointUrl"
 
         echo $endpointUrl > ./ls-preview-url.txt
@@ -117,9 +163,35 @@ runs:
       if: ${{ !cancelled() && steps.create-instance.outcome == 'success' }}
       shell: bash
       run: |
-        log_response=$(curl -X GET \
-            -H "ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}" \
-            -H "content-type: application/json" \
-            https://api.localstack.cloud/v1/compute/instances/$previewName/logs)
-        
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        CONTENT_TYPE_HEADER="content-type: application/json"
+        API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
+
+        # TODO code duplication
+        retry() {
+            local retries=5
+            local count=0
+            local wait=5
+            while [ $count -lt $retries ]; do
+                "$@"
+                local exit_code=$?
+                if [ $exit_code -eq 0 ]; then
+                    return 0
+                fi
+                count=$((count + 1))
+                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)"
+                sleep $wait
+            done
+            echo "Command failed after $retries retries."
+            return 1
+        }
+
+        fetch_logs() {
+            log_response=$(curl --fail-with-body -s -X GET \
+                -H "$AUTH_HEADER" \
+                -H "$CONTENT_TYPE_HEADER" \
+                "$API_URL_BASE/$previewName/logs")
+        }
+
+        retry fetch_logs
         echo "$log_response" | jq -r '.[].content'
