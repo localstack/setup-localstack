@@ -18,14 +18,14 @@ runs:
     - name: Download current workflow's Local State artifact
       id: get-state-artifact
       if: ${{ inputs.action == 'load' }}
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 #v7
       continue-on-error: true
       with:
         name: ${{ inputs.name }}
 
     # If the above fails, try to get the latest artifact from given workflow
     - name: Download latest Local State artifact
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@0bd50d53a6d7fb5cb921e607957e9cc12b4ce392 #v12
       if: ${{ inputs.action == 'load' && steps.get-state-artifact.outcome == 'failure' }}
       with:
         name: ${{ inputs.name }}
@@ -49,7 +49,7 @@ runs:
         ACTION: "${{ inputs.action }}"
 
     - name: Upload LocalStack State
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
       if: ${{ inputs.action == 'save' }}
       with:
         name: ${{ inputs.name }}

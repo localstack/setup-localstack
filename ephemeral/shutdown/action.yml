@@ -14,7 +14,7 @@ runs:
   using: composite
   steps:
     - name: Download PR artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
       with:
         name: pr-id
 
@@ -69,7 +69,7 @@ runs:
         retry shutdown_instance
     
     - name: Update status comment
-      uses: actions-cool/maintain-one-comment@v3.1.1
+      uses: actions-cool/maintain-one-comment@4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
       with:
         token: ${{ inputs.github-token }}
         body: |
