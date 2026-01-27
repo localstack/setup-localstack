@@ -1,5 +1,6 @@
 name: LocalStack Ephemeral Instance Test
-on:  pull_request
+on:  
+  workflow_dispatch:
 
 jobs:
   preview-test:
@@ -26,7 +27,7 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
           PREVIEW_CMD: |-
             awslocal s3 mb s3://test-bucket
             awslocal sqs create-queue --queue-name=test-queue
@@ -78,4 +79,4 @@ jobs:
             }
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-          GH_ACTION_VERSION: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
