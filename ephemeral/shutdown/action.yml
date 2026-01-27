@@ -33,30 +33,18 @@ runs:
         echo "previewName=$previewName" >> $GITHUB_ENV
 
     - name: Shutdown ephemeral instance
+      # Source shared retry function
+      # GH_ACTION_ROOT is set in the main action.yml and points to the root of the action
+      # This ensures the script is found regardless of where the action is run from.
+      env:
+        SHARED_SCRIPTS_PATH: ${{ env.GH_ACTION_ROOT }}/.github/actions/shared-scripts
       shell: bash
       run: |
         AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
-        retry() {
-            local retries=5
-            local count=0
-            local wait=5
-            while [ $count -lt $retries ]; do
-                ( set +e; "$@"; ) # Run command in subshell with set -e disabled
-                local exit_code=$?
-                if [ $exit_code -eq 0 ]; then
-                    return 0
-                fi
-                count=$((count + 1))
-                echo "Command failed with exit code $exit_code. Retrying in $wait seconds... ($count/$retries)" > /dev/tty
-                sleep $wait
-            done
-            echo "Command failed after $retries retries." > /dev/tty
-            return 1
-        }
-
+        source "$SHARED_SCRIPTS_PATH/retry-function.sh"
         shutdown_instance() {
             # The API returns a 200 on successful deletion.
             # We use --fail-with-body so curl fails on server errors (5xx) and triggers the retry.
