@@ -39,21 +39,25 @@ runs:
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
-        source ${{ github.action_path }}/retry-function.sh
+        source ${{ github.action_path }}/../retry-function.sh
         shutdown_instance() {
             # The API returns a 200 on successful deletion.
             # We use --fail-with-body so curl fails on server errors (5xx) and triggers the retry.
             # We allow a 404 since that means the instance is already gone.
+            local http_code
             http_code=$(curl --fail-with-body -s -o /dev/null -w "%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
-            if [ $? -eq 0 ]; then
-              if [ "$http_code" -eq 200 ]; then
-                  echo "Instance '$previewName' deleted successfully."
-              elif [ "$http_code" -eq 404 ]; then
-                  echo "Instance '$previewName' was already deleted (not found)."
-              fi
+            local exit_code=$?
+            if [ $exit_code -ne 0 ]; then
+              echo "Error deleting instance, curl failed with exit code $exit_code. API response: $http_code" >&2
+              return 1
+            fi
+            if [ "$http_code" -eq 200 ]; then
+                echo "Instance '$previewName' deleted successfully."
+            elif [ "$http_code" -eq 404 ]; then
+                echo "Instance '$previewName' was already deleted (not found)."
             fi
         }
         retry shutdown_instance
