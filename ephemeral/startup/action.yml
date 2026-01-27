@@ -209,6 +209,16 @@ runs:
               echo "API returned an empty response when fetching logs."
               return 1
             fi
+
+            # Now, check if jq extracts any content
+            local extracted_content
+            extracted_content=$(echo "$log_response" | jq -r '.[].content')
+            if [ -z "$extracted_content" ]; then
+              echo "No content found in logs or logs are empty after extraction."
+              echo "Raw API response for logs: $log_response" # This will be printed on retry attempts
+              return 1
+            fi
+
             echo "$log_response"
         }
         echo "Fetching logs for $previewName ..."
