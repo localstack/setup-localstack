@@ -43,16 +43,21 @@ runs:
         shutdown_instance() {
             # The API returns a 200 on successful deletion.
             # We use --fail-with-body so curl fails on server errors (5xx) and triggers the retry.
-            # We allow a 404 since that means the instance is already gone.
-            local http_code
-            http_code=$(curl --fail-with-body -s -o /dev/null -w "%{http_code}" -X DELETE \
+            local response
+            response=$(curl --fail-with-body -s -w "\n%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
             local exit_code=$?
+            local http_code=$(echo "$response" | tail -n1)
+            local body=$(echo "$response" | sed '$d')
+
             if [ $exit_code -ne 0 ]; then
-              echo "Error deleting instance, curl failed with exit code $exit_code. API response: $http_code" >&2
-              return 1
+              # A 404 means it's already gone, which is a success case for shutdown.
+              if [ "$http_code" -ne 404 ]; then
+                echo "Error deleting instance, curl failed with exit code $exit_code. API response: $body" >&2
+                return 1
+              fi
             fi
             if [ "$http_code" -eq 200 ]; then
                 echo "Instance '$previewName' deleted successfully."
@@ -60,6 +65,7 @@ runs:
                 echo "Instance '$previewName' was already deleted (not found)."
             fi
         }
+
         retry shutdown_instance
     
     - name: Update status comment

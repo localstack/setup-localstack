@@ -64,16 +64,15 @@ runs:
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
         source ${{ github.action_path }}/../retry-function.sh
+
         fetch_instances() {
             local list_response
             list_response=$(curl --fail-with-body -s -X GET \
               -H "$AUTH_HEADER" \
               -H "$CONTENT_TYPE_HEADER" \
               "$API_URL_BASE")
-            if [ $? -ne 0 ]; then
-              echo "API returned an error: $list_response"
-              return 1
-            fi
+            if [ $? -ne 0 ]; then echo "curl command failed while fetching instances. Response: $list_response" >&2; return 1; fi
+            if ! check_for_api_error "$list_response" "fetch instances"; then return 1; fi
             echo "$list_response"
         }
 
@@ -90,16 +89,18 @@ runs:
 
         delete_instance() {
             # We expect a 200 on success or 404 if it's already gone. Other codes are errors.
-            local http_code
-            http_code=$(curl --fail-with-body -s -o /dev/null -w "%{http_code}" -X DELETE \
+            local response
+            response=$(curl --fail-with-body -s -w "\n%{http_code}" -X DELETE \
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName")
             local exit_code=$?
-            if [ $exit_code -ne 0 ]; then
-                echo "Error deleting instance, curl failed with exit code $exit_code. API response: $http_code" >&2
-                return 1
-            fi
+            local http_code=$(echo "$response" | tail -n1)
+            local body=$(echo "$response" | sed '$d')
+
+            if [ $exit_code -ne 0 ]; then echo "curl command failed while deleting instance. Response: $body" >&2; return 1; fi
+            if ! check_for_api_error "$body" "delete instance"; then return 1; fi
+
             if [ "$http_code" -eq 200 ]; then
                 echo "Instance '$previewName' deleted successfully."
             fi
@@ -119,9 +120,10 @@ runs:
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE")
-            if [ $? -ne 0 ] || ! echo "$response" | jq -e 'has("endpoint_url") and (.endpoint_url | test(".+"))' > /dev/null; then
-              echo "Unable to create preview environment. API response: $response"
-              return 1
+            if [ $? -ne 0 ]; then echo "curl command failed while creating instance. Response: $response" >&2; return 1; fi
+            if ! check_for_api_error "$response" "create instance"; then return 1; fi
+            if ! echo "$response" | jq -e 'has("endpoint_url") and (.endpoint_url | test(".+"))' > /dev/null; then
+              echo "Invalid response from instance creation API: $response" >&2; return 1;
             fi
             echo "$response"
         }
@@ -169,22 +171,12 @@ runs:
                 -H "$AUTH_HEADER" \
                 -H "$CONTENT_TYPE_HEADER" \
                 "$API_URL_BASE/$previewName/logs")
-            if [ $? -ne 0 ]; then
-              echo "API returned an error while fetching logs: $log_response"
-              return 1
-            fi
-            if [ -z "$log_response" ]; then
-              echo "API returned an empty response when fetching logs."
-              return 1
-            fi
+            if [ $? -ne 0 ]; then echo "curl command failed while fetching logs. Response: $log_response" >&2; return 1; fi
+            if ! check_for_api_error "$log_response" "fetch logs"; then return 1; fi
 
-            # Now, check if jq extracts any content
-            local extracted_content
-            extracted_content=$(echo "$log_response" | jq -r '.[].content')
-            if [ -z "$extracted_content" ]; then
-              echo "No content found in logs or logs are empty after extraction."
-              echo "Raw API response for logs: $log_response" # This will be printed on retry attempts
-              return 1
+            # A valid log response must be a JSON array.
+            if ! echo "$log_response" | jq -e 'if type == "array" then true else false end' > /dev/null; then
+              echo "Invalid response from logs API (expected a JSON array): $log_response" >&2; return 1;
             fi
 
             echo "$log_response"

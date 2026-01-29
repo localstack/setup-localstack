@@ -20,3 +20,15 @@ retry() {
     echo "Command failed after $retries retries." >&2
     return 1
 }
+
+# Helper function to check for a JSON error response from the API
+# Usage: check_for_api_error "<response_body>" "<context_message>"
+check_for_api_error() {
+    local response="$1"
+    local context_message="$2"
+    if echo "$response" | jq -e 'if type == "object" and has("error") then true else false end' > /dev/null; then
+      echo "API error during '$context_message': $response" >&2
+      return 1
+    fi
+    return 0
+}
