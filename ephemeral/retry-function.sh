@@ -7,10 +7,13 @@ retry() {
     local retries=5
     local count=0
     local wait=5
+    local output
     while [ $count -lt $retries ]; do
-        ( set +e; "$@"; ) # Run command in subshell with set -e disabled
+        # We disable set -e for the command and capture its output.
+        output=$(set +e; "$@")
         local exit_code=$?
         if [ $exit_code -eq 0 ]; then
+            echo "$output"
             return 0
         fi
         count=$((count + 1))
@@ -18,6 +21,7 @@ retry() {
         sleep $wait
     done
     echo "Command failed after $retries retries." >&2
+    echo "$output" # Also return the output of the last failed attempt for debugging
     return 1
 }
 

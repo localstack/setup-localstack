@@ -179,6 +179,12 @@ runs:
               echo "Invalid response from logs API (expected a JSON array): $log_response" >&2; return 1;
             fi
 
+            # Check if the logs contain the "Ready." message, indicating the instance is fully started.
+            if ! echo "$log_response" | jq -e '.[] | select(.content | contains("Ready."))' > /dev/null; then
+              echo "Instance is not ready yet, waiting for 'Ready.' message in logs..." >&2
+              return 1
+            fi
+
             echo "$log_response"
         }
         echo "Fetching logs for $previewName ..."
