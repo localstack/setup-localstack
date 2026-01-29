@@ -5,7 +5,7 @@ inputs:
   github-token:
     description: 'Github token used to create PR comments'
     required: true
-  localstack-auth-token:
+  localstack-api-key:
     description: 'LocalStack Auth Token used to create the preview environment'
     required: false
   preview-cmd:
@@ -59,7 +59,7 @@ runs:
       shell: bash
       id: create-instance
       run: |
-        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
@@ -160,7 +160,7 @@ runs:
       env:
         previewName: ${{ steps.preview-name.outputs.name }}
       run: |
-        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 

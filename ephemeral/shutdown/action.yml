@@ -2,7 +2,7 @@ name: Shutdown Ephemeral Instance
 description: 'Shutdowns an Ephemeral Instance (PR Preview)'
 
 inputs:
-  localstack-auth-token:
+  localstack-api-key:
     description: 'LocalStack Auth Token used to access the platform api'
     required: false
   github-token:
@@ -35,7 +35,7 @@ runs:
     - name: Shutdown ephemeral instance
       shell: bash
       run: |
-        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-auth-token }}}}"
+        AUTH_HEADER="ls-api-key: ${LOCALSTACK_AUTH_TOKEN:-${LOCALSTACK_API_KEY:-${{ inputs.localstack-api-key }}}}"
         CONTENT_TYPE_HEADER="content-type: application/json"
         API_URL_BASE="https://api.localstack.cloud/v1/compute/instances"
 
