@@ -194,5 +194,6 @@ runs:
           echo "Error: Failed to fetch logs after multiple retries."
           exit 1
         fi
+        echo "raw logs: $log_response"
         echo "Logs:"
         echo "$log_response" | jq -r '.[].content'
