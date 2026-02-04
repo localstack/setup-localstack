@@ -71,7 +71,7 @@ runs:
         fi
 
     - name: Update status comment
-      uses: actions-cool/maintain-one-comment@v4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
+      uses: actions-cool/maintain-one-comment@4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
       with:
         token: ${{ inputs.github-token }}
         body: |
