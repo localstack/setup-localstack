@@ -21,14 +21,14 @@ runs:
     # Try to get pr artifact from current workflow
     - name: Download current PR artifact
       id: get-pr-artifact
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
       continue-on-error: true
       with:
         name: pr-id
 
     # If the above fails, try to get the latest pr artifact from the PR related workflows
     - name: Download latest PR artifact
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@0bd50d53a6d7fb5cb921e607957e9cc12b4ce392 # v12
       if: ${{ steps.get-pr-artifact.outcome == 'failure' }}
       with:
         name: pr-id
@@ -44,13 +44,13 @@ runs:
     - name: Download preview instance URL
       id: get-preview-instance-url-artifact
       if: inputs.include-preview
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
       with:
         name: preview-instance-url
 
     # If the above fails, try to get the latest pr artifact from the PR related workflows
     - name: Download latest PR artifact
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@0bd50d53a6d7fb5cb921e607957e9cc12b4ce392 # v12
       if: ${{ steps.get-preview-instance-url-artifact.outcome == 'failure' }}
       with:
         name: preview-instance-url
@@ -71,7 +71,7 @@ runs:
         fi
 
     - name: Update status comment
-      uses: actions-cool/maintain-one-comment@v3.1.1
+      uses: actions-cool/maintain-one-comment@4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
       with:
         token: ${{ inputs.github-token }}
         body: |

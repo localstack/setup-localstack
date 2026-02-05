@@ -18,7 +18,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -31,7 +31,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Install only CLIs and startup later
 ```yml
 - name: Install LocalStack CLIs
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
     skip-startup: 'true'
     install-awslocal: 'true'
@@ -39,7 +39,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ...
 
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
     image-tag: 'latest'
   env:
@@ -49,7 +49,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -63,7 +63,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Load an already saved state
 ```yml
 - name: Start LocalStack and Load State
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -78,7 +78,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 
 ### Manage Application Previews (on an Ephemeral Instance)
 ```yml
-uses: LocalStack/setup-localstack@v0.2.3
+uses: LocalStack/setup-localstack@v0.2.5
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -93,7 +93,7 @@ uses: LocalStack/setup-localstack@v0.2.3
 ...
 
 with:
-  uses: LocalStack/setup-localstack@v0.2.3
+  uses: LocalStack/setup-localstack@v0.2.5
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -137,7 +137,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.2.3
+        uses: LocalStack/setup-localstack@v0.2.5
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
@@ -156,7 +156,7 @@ jobs:
           echo "Test Execution complete!"
 
       - name: Save LocalStack State
-        uses: LocalStack/setup-localstack@v0.2.3
+        uses: LocalStack/setup-localstack@v0.2.5
         with:
           state-backend: local
           state-action: save
