@@ -51,6 +51,10 @@ inputs:
     description: 'Skip stopping LocalStack Ephemeral Instance'
     required: false
     default: 'true'
+  skip-configure-environment:
+    description: Do not configure the CI environment to talk to LocalStack by default
+    required: false
+    default: ""
   state-action:
     description: |
       Manage LocalStack state
@@ -124,6 +128,14 @@ runs:
             "skip-wait": ${{ toJSON(inputs.skip-wait) }}
           }
 
+    - name: Configure CI environment to use LocalStack
+      if: ${{ inputs.skip-configure-environment != 'true' }}
+      shell: bash
+      run: |
+        echo "AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566" >> $GITHUB_ENV
+        echo "AWS_ACCESS_KEY_ID=test" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=test" >> $GITHUB_ENV
+
     - name: Create Ephemeral Instance
       if: ${{ inputs.state-action == 'start' && inputs.state-backend == 'ephemeral' }}
       uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
@@ -161,7 +173,7 @@ runs:
             "ci-project": ${{ toJSON(inputs.ci-project) }},
             "include-preview": ${{ inputs.include-preview != '' && toJSON(inputs.include-preview) || toJSON(env.include-preview) }}
           }
-    
+
     - name: Stop Ephemeral Instance
       if: ${{ (inputs.skip-ephemeral-stop == 'false' || inputs.state-action == 'stop') && inputs.state-backend == 'ephemeral' }}
       uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
