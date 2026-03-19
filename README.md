@@ -25,8 +25,8 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
   env:
     LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
-> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required to be set if `use-pro` is set to `true`.  
-If the key is not found LocalStack by default falls back to the CE edition and displays a warning.
+> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required. Since `use-pro` now defaults to `true`, the action will use the Pro image by default. 
+> The `use-pro` input will be removed in a future release.
 
 ### Install only CLIs and startup later
 ```yml
@@ -122,7 +122,7 @@ with:
 | `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `''` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `''` |
 | `state-backend`    | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
-| `use-pro`          | Whether to use the Pro version of LocalStack (requires Auth Token to be configured) | `false`  |
+| `use-pro`          | Whether to use the Pro version of LocalStack (requires Auth Token to be configured). Will be removed in a future release. | `true`  |
 
 ## Example workflow
 ```yml
@@ -142,7 +142,6 @@ jobs:
           image-tag: 'latest'
           install-awslocal: 'true'
           configuration: DEBUG=1
-          use-pro: 'true'
           state-backend: cloud-pods
           state-action: load
           state-name: my-cloud-pod

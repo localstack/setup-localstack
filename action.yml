@@ -16,9 +16,10 @@ inputs:
     required: true
     default: 'true'
   use-pro:
-    description: 'Whether to use LocalStack Pro (requires a valid CI Auth Token)'
+    description: 'Deprecated. Whether to use LocalStack Pro (requires a valid CI Auth Token)'
     required: false
-    default: 'false'
+    default: 'true'
+    deprecationMessage: 'use-pro is deprecated and will be removed in a future release. The pro image is now the default.'
   configuration:
     description: 'Configuration variables to use for LocalStack'
     required: false

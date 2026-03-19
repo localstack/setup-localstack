@@ -11,9 +11,10 @@ inputs:
     required: true
     default: 'true'
   use-pro:
-    description: 'Whether to use LocalStack Pro (requires a valid CI Auth Token)'
+    description: 'Deprecated. Whether to use LocalStack Pro (requires a valid CI Auth Token)'
     required: false
-    default: 'false'
+    default: 'true'
+    deprecationMessage: 'use-pro is deprecated and will be removed in a future release. The pro image is now the default.'
   configuration:
     description: 'Configuration variables to use for LocalStack'
     required: false
@@ -62,7 +63,10 @@ runs:
     - name: Start LocalStack
       run: |
         if [ "$USE_PRO" = true ]; then
-          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -o "x$LOCALSTACK_API_KEY" = "x" ]; then
+          if [ "x$LOCALSTACK_API_KEY" != "x" ]; then
+            echo "WARNING: LOCALSTACK_API_KEY is deprecated, please use LOCALSTACK_AUTH_TOKEN instead."
+          fi
+          if [ "x$LOCALSTACK_AUTH_TOKEN" = "x" -a "x$LOCALSTACK_API_KEY" = "x" ]; then
             echo "WARNING: LocalStack Auth Token not detected, please verify your configuration..."
           fi
           CONFIGURATION="DNS_ADDRESS=127.0.0.1 ${CONFIGURATION}"
