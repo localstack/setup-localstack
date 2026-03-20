@@ -29,7 +29,6 @@ jobs:
               "image-tag": "3.2.0",
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
-              "use-pro": "true",
             }
         env:
           # intentially left `LOCALSTACK_API_KEY` as env here, to ensure the fallback still works for old version
@@ -59,7 +58,6 @@ jobs:
               "image-tag": "latest",
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
-              "use-pro": "true",
             }
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
@@ -111,7 +109,6 @@ jobs:
               "image-tag": "latest",
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
-              "use-pro": "true",
               "state-name": "${{ needs.cloud-pods-save-test.outputs.pod-name }}",
               "state-action": "load"
             }
@@ -160,7 +157,6 @@ jobs:
               "image-tag": "latest",
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
-              "use-pro": "true",
             }
         env:
           LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
@@ -202,7 +198,6 @@ jobs:
               "image-tag": "latest",
               "install-awslocal": "true",
               "configuration": "DEBUG=1",
-              "use-pro": "true",
               "state-name": "local-pods-test",
               "state-action": "load",
               "state-backend": "local",

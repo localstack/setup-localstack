@@ -18,20 +18,20 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
   env:
     LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
-> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required to be set if `use-pro` is set to `true`.  
-If the key is not found LocalStack by default falls back to the CE edition and displays a warning.
+> **NOTE**: The `LOCALSTACK_AUTH_TOKEN` environment variable is required. Since `use-pro` now defaults to `true`, the action will use the Pro image by default. 
+> The `use-pro` input will be removed in a future release.
 
 ### Install only CLIs and startup later
 ```yml
 - name: Install LocalStack CLIs
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
     skip-startup: 'true'
     install-awslocal: 'true'
@@ -39,7 +39,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ...
 
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
     image-tag: 'latest'
   env:
@@ -49,7 +49,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -63,7 +63,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 ### Load an already saved state
 ```yml
 - name: Start LocalStack and Load State
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -78,7 +78,7 @@ If the key is not found LocalStack by default falls back to the CE edition and d
 
 ### Manage Application Previews (on an Ephemeral Instance)
 ```yml
-uses: LocalStack/setup-localstack@v0.2.5
+uses: LocalStack/setup-localstack@v0.3.0
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -93,7 +93,7 @@ uses: LocalStack/setup-localstack@v0.2.5
 ...
 
 with:
-  uses: LocalStack/setup-localstack@v0.2.5
+  uses: LocalStack/setup-localstack@v0.3.0
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -122,7 +122,7 @@ with:
 | `state-action`     | Valid values are `load`, `save`, `start`, `stop`, `''` (empty, don't manage state). Values `start`/`stop` only usable with app previews.  | `''` |
 | `state-backend`    | Either store the state of LocalStack locally, as a Cloud Pod or start an Ephemeral Instance. Valid values are `cloud-pods`, `ephemeral` or `local`. Use this option in unison with `state-action` to control behaviour. | `cloud-pods`  |
 | `state-name`       | Name of the state artifact (without extension) | `false`  |
-| `use-pro`          | Whether to use the Pro version of LocalStack (requires Auth Token to be configured) | `false`  |
+| `use-pro`          | Whether to use the Pro version of LocalStack (requires Auth Token to be configured). Will be removed in a future release. | `true`  |
 
 ## Example workflow
 ```yml
@@ -137,12 +137,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.2.5
+        uses: LocalStack/setup-localstack@v0.3.0
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
           configuration: DEBUG=1
-          use-pro: 'true'
           state-backend: cloud-pods
           state-action: load
           state-name: my-cloud-pod
@@ -156,7 +155,7 @@ jobs:
           echo "Test Execution complete!"
 
       - name: Save LocalStack State
-        uses: LocalStack/setup-localstack@v0.2.5
+        uses: LocalStack/setup-localstack@v0.3.0
         with:
           state-backend: local
           state-action: save
