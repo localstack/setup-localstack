@@ -14,11 +14,13 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ## Usage
 
+> **Pin to `v0.3.2` or later.** `v0.3.2` is the first release published with [GitHub Immutable Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-immutable-releases) enabled, meaning its tag and assets cannot be modified or deleted. Pinning to an immutable tag (or its commit SHA) protects your workflow from supply-chain tampering.
+
 ### Get started with a minimal example
 
 ```yml
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
     image-tag: 'latest'
     install-awslocal: 'true'
@@ -31,7 +33,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 ### Install only CLIs and startup later
 ```yml
 - name: Install LocalStack CLIs
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
     skip-startup: 'true'
     install-awslocal: 'true'
@@ -39,7 +41,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 ...
 
 - name: Start LocalStack
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
     image-tag: 'latest'
   env:
@@ -49,7 +51,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 ### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -63,7 +65,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 ### Load an already saved state
 ```yml
 - name: Start LocalStack and Load State
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
     install-awslocal: 'true'
     state-backend: cloud-pods
@@ -78,7 +80,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ### Manage Application Previews (on an Ephemeral Instance)
 ```yml
-uses: LocalStack/setup-localstack@v0.3.0
+uses: LocalStack/setup-localstack@v0.3.2
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -93,7 +95,7 @@ uses: LocalStack/setup-localstack@v0.3.0
 ...
 
 with:
-  uses: LocalStack/setup-localstack@v0.3.0
+  uses: LocalStack/setup-localstack@v0.3.2
   with:
       github-token: ${{ secrets.GITHUB_TOKEN }}
       state-backend: ephemeral
@@ -137,7 +139,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Start LocalStack
-        uses: LocalStack/setup-localstack@v0.3.0
+        uses: LocalStack/setup-localstack@v0.3.2
         with:
           image-tag: 'latest'
           install-awslocal: 'true'
@@ -155,7 +157,7 @@ jobs:
           echo "Test Execution complete!"
 
       - name: Save LocalStack State
-        uses: LocalStack/setup-localstack@v0.3.0
+        uses: LocalStack/setup-localstack@v0.3.2
         with:
           state-backend: local
           state-action: save
