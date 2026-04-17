@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.2]
+
+### Notes
+
+- **First immutable release.** This is the first release published with [GitHub Immutable Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-immutable-releases) enabled on the repository. The `v0.3.2` tag and its assets cannot be modified or deleted, and the release carries a signed attestation. Users are encouraged to pin to `v0.3.2` (or later) for supply-chain hardening.
+
+## [0.3.1]
+
+- Only show `use-pro` deprecation message on top action input ([#67](https://github.com/LocalStack/setup-localstack/pull/67)).
+
 ## [0.3.0]
 
 ### Breaking Changes
