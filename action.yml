@@ -48,6 +48,10 @@ inputs:
     description: 'Skip wait for LocalStack'
     required: false
     default: 'false'
+  skip-pull:
+    description: 'Skip pulling the LocalStack Docker image. Use when the image is already present locally (e.g. restored from a CI cache via `docker load`).'
+    required: false
+    default: 'false'
   skip-ephemeral-stop:
     description: 'Skip stopping LocalStack Ephemeral Instance'
     required: false
@@ -122,7 +126,8 @@ runs:
             "use-pro": ${{ toJSON(inputs.use-pro) }},
             "configuration": ${{ toJSON(inputs.configuration) }},
             "ci-project": ${{ toJSON(inputs.ci-project) }},
-            "skip-wait": ${{ toJSON(inputs.skip-wait) }}
+            "skip-wait": ${{ toJSON(inputs.skip-wait) }},
+            "skip-pull": ${{ toJSON(inputs.skip-pull) }}
           }
 
     - name: Create Ephemeral Instance

@@ -26,6 +26,10 @@ inputs:
     description: 'Skip wait for LocalStack'
     required: false
     default: 'false'
+  skip-pull:
+    description: 'Skip pulling the LocalStack Docker image. Use when the image is already present locally (e.g. restored from a CI cache via `docker load`). LocalStack start still pulls the image if it is genuinely missing.'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -75,7 +79,9 @@ runs:
         fi
 
         CONFIGURATION="IMAGE_NAME=${IMAGE_NAME} ${CONFIGURATION}"
-        docker pull ${IMAGE_NAME} &
+        if [ "$SKIP_PULL" != "true" ]; then
+          docker pull ${IMAGE_NAME} &
+        fi
         export CI_PROJECT=${{ inputs.ci-project }}
         eval "${CONFIGURATION} localstack start -d"
 
@@ -90,4 +96,5 @@ runs:
         USE_PRO: ${{ inputs.use-pro }}
         CONFIGURATION: ${{ inputs.configuration }}
         SKIP_WAIT: ${{ inputs.skip-wait }}
+        SKIP_PULL: ${{ inputs.skip-pull }}
 
