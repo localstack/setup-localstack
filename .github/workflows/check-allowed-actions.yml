@@ -1,0 +1,42 @@
+name: Check Allowed Actions Policy
+
+# Throwaway diagnostic: confirms whether `actions-cool/maintain-one-comment`
+# is blocked by the org's GitHub Actions "Allowed actions" policy.
+# "Repository access blocked" surfaces at job PREP (before any step runs),
+# so referencing the action is enough to trigger the block if it exists.
+# Run via the Actions tab (workflow_dispatch). Delete once confirmed.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'check-allowed-actions'
+
+jobs:
+  # Control: a third-party action we KNOW is allowed (ci.yml uses it and passes).
+  # Proves the runner/policy isn't blocking third-party actions wholesale.
+  control-known-allowed:
+    name: 'Control: jenseng/dynamic-uses (known allowed)'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
+        with:
+          uses: actions/github-script@v7
+          with: |-
+            { "script": "console.log('dynamic-uses prep + run OK')" }
+
+  # Suspect: the action used only in the ephemeral path.
+  # If blocked, this job fails at "Getting action download info" with
+  # "Repository access blocked" and the PREP-PASSED step never runs.
+  suspect-maintain-one-comment:
+    name: 'Suspect: actions-cool/maintain-one-comment'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reference the suspect action
+        continue-on-error: true
+        uses: actions-cool/maintain-one-comment@4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
+        with:
+          token: ${{ github.token }}
+          body: 'allowed-actions diagnostic (ignore)'
+      - name: PREP PASSED — action is ALLOWED
+        run: echo "If you can read this, the action downloaded fine and is NOT blocked."
