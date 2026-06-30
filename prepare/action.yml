@@ -23,10 +23,9 @@ runs:
         path: ./pr-id.txt
 
     - name: Create initial PR comment
-      uses: actions-cool/maintain-one-comment@4b2dbf086015f892dcb5e8c1106f5fccd6c1476b # v3
+      uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
       with:
-        token: ${{ inputs.github-token }}
-        body: |
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        header: localstack-preview
+        message: |
           ⚡️ Running CI build with LocalStack ...
-          <!-- Sticky Pull Request Comment -->
-        body-include: '<!-- Sticky Pull Request Comment -->'
