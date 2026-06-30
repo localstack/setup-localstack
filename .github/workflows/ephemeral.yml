@@ -67,19 +67,8 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-          
-      # We want explicit shutdown
-      - name: Shutdown ephemeral instance
-        if: ${{ always() }}
-        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
-        with:
-          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
-          with: |-
-            {
-              "github-token": ${{ toJSON(secrets.GITHUB_TOKEN) }},
-              "state-backend": "ephemeral",
-              "state-action": "stop"
-            }
-        env:
-          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
-          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
+
+      # DEMO ONLY (do not merge): shutdown step intentionally removed so the
+      # sticky PR comment stays on the "Preview for this PR" state instead of
+      # being overwritten by the "shut down" message. The instance still
+      # auto-expires via its 5-minute lifetime, so nothing is left running.
