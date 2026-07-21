@@ -40,6 +40,36 @@ jobs:
           LS_VERSION=$(docker ps | grep localstack | cut -d " " -f4 | cut -d ":" -f2)
           exit $(test "x${LS_VERSION}" = "x3.2.0")
 
+  skip-pull-test:
+    name: 'Test skip-pull uses a locally present image'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Pre-pull the image locally
+        run: docker pull localstack/localstack-pro:3.2.0
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+
+      - name: Start LocalStack with skip-pull
+        uses: jenseng/dynamic-uses@8bc24f0360175e710da532c4d19eafdbed489a06 # v1
+        with:
+          uses: LocalStack/setup-localstack@${{ env.GH_ACTION_VERSION }}
+          with: |-
+            {
+              "image-tag": "3.2.0",
+              "install-awslocal": "true",
+              "skip-pull": "true"
+            }
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+          GH_ACTION_VERSION: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.ref_name }}
+
+      - name: Assert LocalStack is running from the local image
+        run: |
+          LS_VERSION=$(docker ps | grep localstack | cut -d " " -f4 | cut -d ":" -f2)
+          exit $(test "x${LS_VERSION}" = "x3.2.0")
+
   cloud-pods-save-test:
     name: 'Test Cloud Pods Action'
     runs-on: ubuntu-latest

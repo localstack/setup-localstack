@@ -48,6 +48,30 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
     LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
 ```
 
+### Use a locally cached image (skip the pull)
+If you restore the LocalStack image from a CI cache (or bake it into a
+self-hosted runner), set `skip-pull: 'true'` to avoid re-pulling it from the
+registry. The image must already be present locally — otherwise LocalStack
+start will pull it as usual.
+```yml
+- name: Restore cached LocalStack image
+  uses: actions/cache@v4
+  with:
+    path: /tmp/localstack-image.tar
+    key: localstack-pro-3.2.0
+
+- name: Load the cached image
+  run: docker load -i /tmp/localstack-image.tar
+
+- name: Start LocalStack without pulling
+  uses: LocalStack/setup-localstack@v0.3.2
+  with:
+    image-tag: '3.2.0'
+    skip-pull: 'true'
+  env:
+    LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+```
+
 ### Save a state later on in the pipeline
 ```yml
 - name: Save LocalStack State
