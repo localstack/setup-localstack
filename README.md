@@ -14,7 +14,7 @@ A GitHub Action to setup [LocalStack](https://github.com/localstack/localstack) 
 
 ## Usage
 
-> **Pin to `v0.3.2` or later.** `v0.3.2` is the first release published with [GitHub Immutable Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-immutable-releases) enabled, meaning its tag and assets cannot be modified or deleted. Pinning to an immutable tag (or its commit SHA) protects your workflow from supply-chain tampering.
+> **Pin to `v0.3.2` or later.** `v0.3.2` is the first release published with [GitHub Immutable Releases](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases) enabled, meaning its tag and assets cannot be modified or deleted. Pinning to an immutable tag (or its commit SHA) protects your workflow from supply-chain tampering.
 
 ### Get started with a minimal example
 
